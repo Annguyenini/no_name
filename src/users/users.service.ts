@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class DatabaseOrmService {
-
-
-
+export class UsersService {
 
 }
