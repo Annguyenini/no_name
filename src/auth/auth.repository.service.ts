@@ -56,5 +56,4 @@ export class AuthRepositoryService{
       throw new Error (`Failed to sign in with supabase: ${err}`)
     }
   }
-
 }
