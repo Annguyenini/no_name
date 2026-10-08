@@ -10,4 +10,21 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  schemas = ["public", "friendships","user"]
+  }
+
+enum Status {
+  active
+  ban
+  deactivate
+  @@schema("user")
+}
+
+model users {
+id String @id @db.Uuid
+username String @unique @db.Text
+display_name String @db.Text
+status Status @default(active)
+avatar_url String? @db.Text
+@@schema("user")
 }

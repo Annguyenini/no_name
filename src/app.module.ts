@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-import { CredentialsModule } from './credentials/credentials.module.js';
-import { DatabaseModule } from './database/database.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { DatabaseOrmModule } from './database-orm/database-orm.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -16,8 +16,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       appSecret: 'YOUR_APP_SECRET',
       serviceId: 'no-name',
     }),
-    CredentialsModule,
-    DatabaseModule,
+    AuthModule,
+    DatabaseOrmModule,
   ],
   controllers: [AppController],
   providers: [AppService],
