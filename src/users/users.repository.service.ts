@@ -6,6 +6,7 @@ export class UserRepositoryService{
   constructor(private readonly prisma: PrismaService) { }
 
   async getUserByUsername(username: string): Promise<UserDTO | null> {
+    try{
     const response = await this.prisma.users.findUnique({
       where: {
         username,
@@ -14,7 +15,11 @@ export class UserRepositoryService{
     )
     if (!response) return null
     const user = new UserDTO().prismaBuild(response)
-    return user
+      return user
+    }
+    catch (err) {
+      throw new Error(`Failed to get user by username at user repository: ${err}`)
+    }
   }
   async insertNewUser(user: UserDTO): Promise<UserDTO | null> {
     try {

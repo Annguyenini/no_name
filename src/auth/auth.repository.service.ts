@@ -6,7 +6,8 @@ import { UserRepositoryService } from "../users/users.repository.service.js";
 import { BadRequestException } from "@nestjs/common";
 import { CompleteSignUpDTO } from "./dto/complete-signup.dto.js";
 import { UserDTO } from "../users/dto/user.dto.js";
-
+import { SignInDTO } from "./dto/signin.dto.js";
+// all request made to this point have to be verify their identities
 
 export class AuthRepositoryService{
   constructor(private readonly supabase: SupabaseClient,
@@ -22,12 +23,38 @@ export class AuthRepositoryService{
     return user
     }
 
-  async completeSignUp(credential:CompleteSignUpDTO) {
-    // check if username exists
-    if (await this.user_repository.getUserByUsername(credential.username)) {
-      throw new BadRequestException("Username already exists")
+  async completeSignUp(user:UserDTO):Promise<UserDTO| null> {
+
+    try {
+      // check if username exists
+
+      if (await this.user_repository.getUserByUsername(user.username)) {
+        throw new BadRequestException("Username already exists")
+      }
+
+      const insert = this.user_repository.insertNewUser(user)
+      if (!insert) {
+        throw new Error("Unexpected error occur when try to insert new user")
+      }
+      return insert
     }
-    const user = new UserDTO
-    const insert = this.user_repository.insertNewUser(user)
+    catch (err) {
+      throw new Error(`Failed to completeSignUp: ${err}`)
+    }
   }
+  async signIn(user: SignInDTO) {
+    try {
+      const signin = await this.supabase.auth.signInWithPassword(
+        {
+          email: user.indentifier,
+          password:user.password
+        }
+      )
+      return signin
+    }
+    catch (err) {
+      throw new Error (`Failed to sign in with supabase: ${err}`)
+    }
+  }
+
 }
