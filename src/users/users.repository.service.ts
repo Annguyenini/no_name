@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service.js";
+import { PrismaService } from "../prisma/prisma.service.js";
 import { UserDTO } from "./dto/user.dto.js";
 @Injectable()
 export class UserRepositoryService{
@@ -30,13 +30,14 @@ export class UserRepositoryService{
         create: {
           id: user.id,
           username:user.username,
-          display_name:user.username,
+          display_name: user.username,
+          avatar_url :user.avatar_url,
           status:"active"
         },
         update: {
           username: user.username,
-          display_name:user.display_name
-
+          display_name:user.display_name,
+            avatar_url :user.avatar_url
         }
       })
       if (!success) return null

@@ -2,7 +2,6 @@ import { UuidFactory } from "@nestjs/core/internal";
 import { IsString } from "class-validator";
 import { UUID } from "crypto";
 import { users } from "../../generated/prisma/client.js";
-
 export class UserDTO {
   @IsString()
   id:string
