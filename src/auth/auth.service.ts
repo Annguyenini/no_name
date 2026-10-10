@@ -28,25 +28,25 @@ export class AuthService {
     response.id = signUp.data.user.id
     return response
   }
-  async completeSignUp(user: UserDTO) {
-    try {
-      const completeSignUp = await this.auth_repository.completeSignUp(user)
-      return completeSignUp
-    }
-    catch (err) {
-      throw err
-    }
-  }
-  async emailVerification(body:VerifyEmailDTO) {
-    const verify = await this.auth_repository.emailVerification(body.email, body.token  )
-    const response = new SignInResponseDTO()
-    if (!verify.data.user || !verify.data.session) {
-      throw new UnauthorizedException("Failed to verify")
-    }
-    response.id = verify.data.user.id
-    response.access_token = verify.data.session.access_token
-    response.refresh_token = verify.data.session.refresh_token
-    return response
-  }
+  // async completeSignUp(user: UserDTO) {
+  //   try {
+  //     const completeSignUp = await this.auth_repository.completeSignUp(user)
+  //     return completeSignUp
+  //   }
+  //   catch (err) {
+  //     throw err
+  //   }
+  // }
+  // async emailVerification(body:VerifyEmailDTO) {
+  //   const verify = await this.auth_repository.emailVerification(body.email, body.token  )
+  //   const response = new SignInResponseDTO()
+  //   if (!verify.data.user || !verify.data.session) {
+  //     throw new UnauthorizedException("Failed to verify")
+  //   }
+  //   response.id = verify.data.user.id
+  //   response.access_token = verify.data.session.access_token
+  //   response.refresh_token = verify.data.session.refresh_token
+  //   return response
+  // }
 
 }
