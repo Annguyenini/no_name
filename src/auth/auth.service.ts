@@ -6,7 +6,7 @@ import { SignUpDTO } from './dto/signup.dto.js';
 import { SignUpResponseDTO } from './dto/signup-response.dto.js';
 import { User } from '@supabase/supabase-js';
 import { UserDTO } from '../users/dto/user.dto.js';
-import { VerifyEmailDTO } from './dto/verify-email.sto.js';
+import { Email } from './dto/verify-email.sto.js';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +27,10 @@ export class AuthService {
     }
     response.id = signUp.data.user.id
     return response
+  }
+  async resendEmailConfirmation(user: Email) {
+    const resend = await this.auth_repository.resendSignupEmailConfirmation(user)
+    return
   }
   // async completeSignUp(user: UserDTO) {
   //   try {

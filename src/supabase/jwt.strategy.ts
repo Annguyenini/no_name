@@ -1,6 +1,5 @@
 import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Strategy } from 'passport-custom';
-import { jwtConstants } from '../auth/constants.js';
 import { Request } from "express";
 import { PassportStrategy } from '@nestjs/passport';
 import { SupabaseClient } from "@supabase/supabase-js";

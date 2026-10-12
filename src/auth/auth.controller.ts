@@ -1,19 +1,26 @@
-import { Body, Controller, Get, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AllExceptionsHandler } from '../interceptors/all-exceptions-handler.intercept.js';
 import { UsersService } from '../users/users.service.js';
 import { AuthService } from './auth.service.js';
 import { SignInDTO } from './dto/signin.dto.js';
 import { SignUpDTO } from './dto/signup.dto.js';
-import { VerifyEmailDTO } from './dto/verify-email.sto.js';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseGuard } from '../supabase/supabase.guard.js';
+import { Email } from './dto/verify-email.sto.js';
 
 @Controller('auth')
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform:true
+    }),
+)
 export class AuthController {
   constructor (private readonly auth_service:AuthService){}
   // sign up\
   @Post("/signup")
-  @UseInterceptors(AllExceptionsHandler)
+  @UseFilters(AllExceptionsHandler)
   async signUp(@Body() user: SignUpDTO){
     return await this.auth_service.signUp(user)
   }
@@ -24,15 +31,22 @@ export class AuthController {
   // }
   //Sign in
   @Post("/signin")
-  @UseInterceptors(AllExceptionsHandler)
+  @UseFilters(AllExceptionsHandler)
   async signIn(@Body() user: SignInDTO) {
+    console.log(user)
     return await this.auth_service.signIn(user)
   }
 
+  @Post("/resend-email-verification")
+  @UseFilters(AllExceptionsHandler)
+  async resend(@Body() email:Email) {
+    return await this.auth_service.resendEmailConfirmation(email)
+  }
   @UseGuards(SupabaseGuard)
   @Get("/test")
-  @UseInterceptors(AllExceptionsHandler)
+  @UseFilters(AllExceptionsHandler)
   async test() {
-
   }
+
+
 }

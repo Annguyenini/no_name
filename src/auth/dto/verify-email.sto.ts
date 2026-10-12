@@ -1,4 +1,6 @@
-export class VerifyEmailDTO {
+import { IsEmail, IsString } from "class-validator";
+
+export class Email {
+  @IsEmail()
   email: string;
-  token: string;
 }

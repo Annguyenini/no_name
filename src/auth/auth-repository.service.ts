@@ -7,6 +7,9 @@ import { CompleteSignUpDTO } from "./dto/complete-signup.dto.js";
 import { UserDTO } from "../users/dto/user.dto.js";
 import { SignInDTO } from "./dto/signin.dto.js";
 import { SupabaseService } from "../supabase/supabase.service.js";
+import { response } from "express";
+import { AppException, SupabaseException, SystemException } from "../core/exceptions/app-exceptions.js";
+import { Email } from "./dto/verify-email.sto.js";
 
 // all request made to this point have to be verify their identities
 @Injectable()
@@ -25,6 +28,7 @@ export class AuthRepositoryService{
         email: credential.email,
         password: credential.password,
       })
+
       if (user.error || !user.data.user) {
         console.error(user.error)
         throw new BadRequestException("Email already associate with an account")
@@ -88,5 +92,43 @@ export class AuthRepositoryService{
       throw new InternalServerErrorException (`Failed to sign in with supabase: ${err}`)
     }
   }
+  async resendSignupEmailConfirmation(
+    credential: Email,
+  ) {
+    try {
+      const { data, error } =
+        await this.supabase.auth.resend({
+          type: 'signup',
+          email: credential.email,
+        })
 
+      if (error) {
+        throw new SupabaseException(
+          error,
+          'Failed to resend email confirmation',
+          500,
+        )
+      }
+
+      if (!data) {
+        throw new SupabaseException(
+          'Supabase returned no data',
+          'Failed to resend email confirmation',
+          500,
+        )
+      }
+
+      return data
+    } catch (err: unknown) {
+      if (err instanceof AppException) {
+        throw err
+      }
+
+      throw new SystemException(
+        err,
+        'Failed to resend email confirmation',
+        500,
+      )
+    }
+  }
 }
