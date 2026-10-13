@@ -75,11 +75,7 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/auth/signin')
         .send({"identifier":legit_email,
-<<<<<<< HEAD
-            "password":"Testing1123@"})
-=======
             "password":"OigioiOi112ww@"})
->>>>>>> fd4444f (auth e2e test)
         .expect(401)
 
     })
