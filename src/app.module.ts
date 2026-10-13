@@ -5,7 +5,7 @@ import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { SupabaseModule } from './supabase/supabase.module.js';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -18,8 +18,9 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       appSecret: 'YOUR_APP_SECRET',
       serviceId: 'no-name',
     }),
-    ConfigModule.forRoot({
+    NestConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
 
     }),
     AuthModule,

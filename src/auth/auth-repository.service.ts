@@ -76,21 +76,16 @@ export class AuthRepositoryService{
   //   }
   // }
   async signIn(user: SignInDTO) {
-    try {
-      const signin = await this.supabase.auth.signInWithPassword(
-        {
-          email: user.identifier,
-          password:user.password
-        }
-      )
-      if (signin.error || !signin.data) {
-        throw new UnauthorizedException(`Invalid credential`)
+    const signin = await this.supabase.auth.signInWithPassword(
+      {
+        email: user.identifier,
+        password:user.password
       }
-      return signin
+    )
+    if (signin.error || !signin.data) {
+      throw new UnauthorizedException(`Invalid credential`)
     }
-    catch (err) {
-      throw new InternalServerErrorException (`Failed to sign in with supabase: ${err}`)
-    }
+    return signin
   }
   async resendSignupEmailConfirmation(
     credential: Email,
