@@ -9,14 +9,14 @@ generator client {
 }
 datasource db {
   provider = "postgresql"
-  schemas = ["public", "friendships","user"]
+  schemas = ["public", "friendships", "users", "permission", "auth"]
   }
 
 enum Status {
   active
   ban
   deactivate
-  @@schema("user")
+  @@schema("users")
 }
 
 model users {
@@ -25,5 +25,20 @@ username String @unique @db.Text
 display_name String @db.Text
 status Status @default(active)
 avatar_url String? @db.Text
-@@schema("user")
+@@schema("users")
+}
+
+
+enum Role {
+  admin
+  user
+  @@schema("permission")
+}
+
+model permission{
+id String @id @db.Uuid
+role Role
+last_update DateTime @db.Timestamptz()
+@@schema("permission")
+
 }

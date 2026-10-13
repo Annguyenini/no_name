@@ -131,4 +131,50 @@ export class AuthRepositoryService{
       )
     }
   }
+  async requestNewAccessToken(refresh_token: string) {
+    try {
+      const refreshed = await this.supabase.auth.refreshSession({
+        refresh_token,
+      });
+
+      if (refreshed.error || !refreshed.data.session || !refreshed.data.user) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      return refreshed;
+    } catch (err: unknown) {
+      if (err instanceof AppException || err instanceof UnauthorizedException) {
+        throw err;
+      }
+
+      throw new SystemException(
+        err,
+        'Failed to refresh access token',
+        500,
+      );
+    }
+  }
+
+  async signOut(access_token: string): Promise<void> {
+    try {
+      const { error } = await this.supabase.auth.admin.signOut(
+        access_token,
+        'local',
+      );
+
+      if (error) {
+        throw new SupabaseException(
+          error,
+          'Failed to sign out',
+          error.status === 401 || error.status === 403 ? 401 : 500,
+        );
+      }
+    } catch (err: unknown) {
+      if (err instanceof AppException) {
+        throw err;
+      }
+
+      throw new SystemException(err, 'Failed to sign out', 500);
+    }
+  }
 }

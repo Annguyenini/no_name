@@ -19,6 +19,24 @@ export class AuthService {
     response.refresh_token = signIn.data.session.refresh_token
     return response
   }
+  async requestNewAccessToken(refresh_token: string): Promise<SignInResponseDTO> {
+    const refreshed = await this.auth_repository.requestNewAccessToken(refresh_token);
+    const session = refreshed.data.session;
+    const user = refreshed.data.user;
+
+    if (!session || !user) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const response = new SignInResponseDTO();
+    response.access_token = session.access_token;
+    response.refresh_token = session.refresh_token;
+    return response;
+  }
+  async signOut(access_token: string): Promise<{ message: string }> {
+    await this.auth_repository.signOut(access_token);
+    return { message: 'Signed out successfully' };
+  }
   async signUp(user: SignUpDTO) {
     const signUp = await this.auth_repository.signUp(user)
     const response = new SignUpResponseDTO()
