@@ -6,8 +6,13 @@ import { AppModule } from './../src/app.module.js';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
+<<<<<<< HEAD
   var legit_email = "testvl@gmail.com"
   var legit_password = "Testing11234@"
+=======
+  var legit_email = process.env.LEGIT_EMAIL_TEST
+  var legit_password = process.env.LEGIT_PASSWORD_TEST
+>>>>>>> fd4444f (auth e2e test)
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -70,7 +75,11 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/auth/signin')
         .send({"identifier":legit_email,
+<<<<<<< HEAD
             "password":"Testing1123@"})
+=======
+            "password":"OigioiOi112ww@"})
+>>>>>>> fd4444f (auth e2e test)
         .expect(401)
 
     })
