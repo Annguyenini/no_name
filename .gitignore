@@ -44,7 +44,7 @@ lerna-debug.log*
 .env.test
 .env.production.local
 .env.local
-
+.env.test_supabase
 # temp directory
 .temp
 .tmp

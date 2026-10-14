@@ -1,0 +1,8 @@
+services:
+  server:
+    container_name: nest-server
+    build: .
+    env_file:
+      - .env.test_supabase
+    ports:
+      - "3000:3000"
