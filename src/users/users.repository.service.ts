@@ -21,6 +21,21 @@ export class UserRepositoryService{
       throw new Error(`Failed to get user by username at user repository: ${err}`)
     }
   }
+  async getUserById(id:string) {
+    try {
+      const response = await this.prisma.users.findUniqueOrThrow({
+        where: {
+          id,
+        },
+      },)
+      if (!response) return null
+      const user = new UserDTO().prismaBuild(response)
+      return user
+    }
+    catch (err) {
+      throw new Error(`Failed to get user by id at user repository: ${err}`)
+    }
+  }
   async insertNewUser(user: UserDTO): Promise<UserDTO | null> {
     try {
       const success = await this.prisma.users.upsert({

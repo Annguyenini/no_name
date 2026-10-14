@@ -1,5 +1,23 @@
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS friendships;
+CREATE SCHEMA IF NOT EXISTS users;
+
+-- Create users table
+CREATE TYPE users.status AS ENUM (
+    'active',
+    'ban',
+    'deactivate'
+);
+
+CREATE TABLE users.users (
+    id UUID PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    display_name TEXT NOT NULL,
+    status users.status NOT NULL DEFAULT 'active',
+    avatar_url TEXT,
+    FOREIGN KEY (id) REFERENCES "auth".users(id) ON DELETE CASCADE
+
+);
 
 -- Create enum type
 CREATE TYPE friendships.relationship AS ENUM (
@@ -19,7 +37,7 @@ CREATE TABLE friendships.friendships (
 
     PRIMARY KEY (id1, id2),
 
-    CHECK (id1 <> id2)
+    CHECK (id1 <> id2),
 
     FOREIGN KEY (id1) REFERENCES "users".users(id) ON DELETE CASCADE,
     FOREIGN KEY (id2) REFERENCES "users".users(id) ON DELETE CASCADE
@@ -40,11 +58,11 @@ CREATE TYPE permission.role as ENUM(
 );
 
 CREATE TABLE permission.permission(
-    id UUID NOT NULL,
-    role permission.role,
+    id UUID PRIMARY KEY,
+    role permission.role NOT NULL,
     last_update TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (id) REFERENCES "user".users(id) ON DELETE CASCADE
-)
+    FOREIGN KEY (id) REFERENCES users.users(id) ON DELETE CASCADE
+);
 
 
 
