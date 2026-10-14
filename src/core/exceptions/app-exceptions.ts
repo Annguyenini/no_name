@@ -28,3 +28,13 @@ export class SystemException extends AppException{
     super(internalMessage,externalMessage, statusCode)
   }
 }
+
+export class DatabaseException extends AppException{
+  constructor(
+    public readonly internalMessage: any,
+    public readonly externalMessage: string,
+    statusCode: number,
+  ) {
+    super(internalMessage,externalMessage, statusCode)
+  }
+}
