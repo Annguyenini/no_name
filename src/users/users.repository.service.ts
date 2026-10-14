@@ -49,7 +49,6 @@ export class UserRepositoryService{
     if (!success) return null
     const User = new UserDTO().prismaBuild(success)
     return User
-
-
   }
+
 }
