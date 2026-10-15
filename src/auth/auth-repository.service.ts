@@ -8,7 +8,7 @@ import { UserDTO } from "../users/dto/user.dto.js";
 import { SignInDTO } from "./dto/signin.dto.js";
 import { SupabaseService } from "../supabase/supabase.service.js";
 import { response } from "express";
-import { AppException, SupabaseException, SystemException } from "../core/exceptions/app-exceptions.js";
+import { AppException, RepositoryExceptions, SupabaseException, SystemException } from "../core/exceptions/app-exceptions.js";
 import { Email } from "./dto/verify-email.sto.js";
 
 // all request made to this point have to be verify their identities
@@ -99,6 +99,7 @@ export class AuthRepositoryService{
 
       if (error) {
         throw new SupabaseException(
+          "supabase",
           error,
           'Failed to resend email confirmation',
           500,
@@ -107,6 +108,7 @@ export class AuthRepositoryService{
 
       if (!data) {
         throw new SupabaseException(
+          "supabase",
           'Supabase returned no data',
           'Failed to resend email confirmation',
           500,
@@ -119,7 +121,8 @@ export class AuthRepositoryService{
         throw err
       }
 
-      throw new SystemException(
+      throw new RepositoryExceptions(
+        'auth',
         err,
         'Failed to resend email confirmation',
         500,
@@ -142,7 +145,8 @@ export class AuthRepositoryService{
         throw err;
       }
 
-      throw new SystemException(
+      throw new RepositoryExceptions(
+        "auth",
         err,
         'Failed to refresh access token',
         500,
@@ -159,6 +163,7 @@ export class AuthRepositoryService{
 
       if (error) {
         throw new SupabaseException(
+          "supabase",
           error,
           'Failed to sign out',
           error.status === 401 || error.status === 403 ? 401 : 500,
@@ -169,7 +174,7 @@ export class AuthRepositoryService{
         throw err;
       }
 
-      throw new SystemException(err, 'Failed to sign out', 500);
+      throw new RepositoryExceptions('auth',err, 'Failed to sign out', 500);
     }
   }
 }

@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module.js';
 import { SupabaseModule } from './supabase/supabase.module.js';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller.js';
+import { UserController } from './user/user.controller.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
@@ -27,7 +28,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     UsersModule,
     SupabaseModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UserController],
   providers: [AppService],
 })
 export class AppModule {}

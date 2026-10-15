@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { UserDTO } from "./dto/user.dto.js";
+import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
 @Injectable()
 export class UserRepositoryService{
   constructor(private readonly prisma: PrismaService) { }
@@ -9,12 +10,12 @@ export class UserRepositoryService{
     const response = await this.prisma.users.findUnique({
       where: {
         username,
-        },
+      },
     },
     )
     if (!response) return null
     const user = new UserDTO().prismaBuild(response)
-      return user
+    return user
 
   }
   async getUserById(id:string) {
@@ -29,26 +30,27 @@ export class UserRepositoryService{
 
   }
   async insertNewUser(user: UserDTO): Promise<UserDTO | null> {
-    const success = await this.prisma.users.upsert({
-      where: {
-        id: user.id
-      },
-      create: {
+    try{
+    const success = await this.prisma.users.create({
+      data: {
         id: user.id,
         username:user.username,
         display_name: user.username,
         avatar_url :user.avatar_url,
         status:"active"
-      },
-      update: {
-        username: user.username,
-        display_name:user.display_name,
-          avatar_url :user.avatar_url
       }
     })
     if (!success) throw new Error("Failed to insert user to database")
     const User = new UserDTO().prismaBuild(success)
-    return User
+      return User
+    }
+    catch (err) {
+      if (err instanceof (PrismaClientKnownRequestError) && err.code === "P2002") {
+        const field = (err.meta?.target as string[]) ?? ["field"]
+        throw new Error(`User with this ${field.join(',')} already exists`)
+      }
+      throw err
+    }
   }
 
 }
