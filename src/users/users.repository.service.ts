@@ -46,7 +46,7 @@ export class UserRepositoryService{
           avatar_url :user.avatar_url
       }
     })
-    if (!success) return null
+    if (!success) throw new Error("Failed to insert user to database")
     const User = new UserDTO().prismaBuild(success)
     return User
   }
