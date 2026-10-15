@@ -8,10 +8,6 @@ export class AllExceptionsHandler implements ExceptionFilter{
   catch(e: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()
-    if (e instanceof HttpException) {
-      response.status(e.getStatus()).json(e.getResponse())
-      return
-    }
     var message
     var internal_message = null
 
@@ -19,21 +15,25 @@ export class AllExceptionsHandler implements ExceptionFilter{
     if (e instanceof AppException) {
       message = e.externalMessage
       internal_message = e.internalMessage ?? {}
+      const status = e instanceof (AppException) ? e.getStatus() : 500
+      this.logger.error(`Error occur: ${message} , ${status}`)
+      if (internal_message) {
+        this.logger.verbose(`Detail of ${e.name}-${message}: ${
+          JSON.stringify(internal_message, null, 2)
+          }`)
+      }
+
+      response.status(status).json({
+        statusCode: status,
+        message: message,
+        timeStamp: new Date().toString()
+      })
     }
-    else {
-     message = "Internal Server Error"
+
+
+    else if (e instanceof(HttpException)) {
+      message = "Internal Server Error"
+      response.status(e.getStatus()).json(e.getResponse())
     }
-    const status = e instanceof (AppException) ? e.getStatus() : 500
-    this.logger.error(`Error occur: ${message} , ${status}`)
-    if (internal_message) {
-      this.logger.verbose(`Detail of ${message}: ${
-        JSON.stringify(internal_message, null, 2)
-        }`)
-    }
-    response.status(status).json({
-      statusCode: status,
-      message: message,
-      timeStamp: new Date().toString()
-    })
   }
 }

@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { Strategy } from 'passport-custom';
 import { Request } from "express";
 import { PassportStrategy } from '@nestjs/passport';
@@ -19,26 +19,20 @@ export class JwtSupabaseStrategy extends PassportStrategy(Strategy,'jwt') {
   }
   // only return id and email
   async validate(request:Request) {
+    const authorization = request.headers.authorization
 
-    try {
-      const authorization = request.headers.authorization
-
-      if (!authorization?.startsWith("Bearer ")) {
-        throw new UnauthorizedException("Missing Token")
-      }
-      const token = authorization.slice(7)
-      const user = await this.supabase.auth.getUser(token)
-
-      if (user.error || !user.data) {
-        throw new UnauthorizedException("Invalid Token")
-      }
-      return {
-        id: user.data.user.id,
-        email: user.data.user.email
-      }
+    if (!authorization?.startsWith("Bearer ")) {
+      throw new UnauthorizedException("Missing Token")
     }
-    catch (err) {
-      throw new Error(`Failed to validate token: ${err}`)
+    const token = authorization.slice(7)
+    const user = await this.supabase.auth.getUser(token)
+
+    if (user.error || !user.data) {
+      throw new UnauthorizedException("Invalid Token")
     }
-   }
+    return {
+      id: user.data.user.id,
+      email: user.data.user.email
+    }
+  }
 }

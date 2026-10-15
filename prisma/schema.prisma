@@ -9,6 +9,7 @@ generator client {
 }
 datasource db {
   provider = "postgresql"
+
   schemas = ["public", "friendships", "users", "permission", "auth"]
   }
 
@@ -17,6 +18,7 @@ enum Status {
   ban
   deactivate
   @@schema("users")
+  @@map("status")
 }
 
 model users {
@@ -33,6 +35,8 @@ enum Role {
   admin
   user
   @@schema("permission")
+  @@map("role")
+
 }
 
 model permission{
