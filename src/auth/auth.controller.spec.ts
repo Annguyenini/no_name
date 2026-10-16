@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service.js';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -7,6 +8,7 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
+      providers: [{ provide: AuthService, useValue: {} }],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -16,3 +18,4 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 });
+// -MIMO: Stub AuthService so the controller unit test does not need auth infrastructure.
