@@ -9,8 +9,7 @@ import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller.js';
 import { UsersController } from './users/users.controller.js';
 import { AdminModule } from './admin/admin.module.js';
-import { S3Service } from './aws/s3/s3.service.js';
-import { S3Module } from './s3/s3.module.js';
+import { S3Module } from './aws/s3/s3.module.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 // -MIMO: Import the admin feature so its protected user-management routes are registered.
@@ -35,6 +34,6 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     S3Module,
   ],
   controllers: [AppController, UsersController],
-  providers: [AppService, S3Service],
+  providers: [AppService],
 })
 export class AppModule {}
