@@ -10,6 +10,7 @@ import { SupabaseGuard } from '../supabase/supabase.guard.js';
 import { Email } from './dto/verify-email.sto.js';
 import { RefreshTokenDTO } from './dto/refresh-token.dto.js';
 import type{ AuthenticatedRequest } from '../core/global-types/authenticated-user.js';
+import { AppException } from '../core/exceptions/app-exceptions.js';
 
 @Controller('auth')
   @UsePipes(
@@ -62,8 +63,8 @@ export class AuthController {
   @UseGuards(SupabaseGuard)
   @Get("/test")
   @UseFilters(AllExceptionsHandler)
-  async test(@Req() request:AuthenticatedRequest) {
-    console.log(request.user)
+  async test(@Req() request: AuthenticatedRequest) {
+    throw new AppException('auth',"testting","testting",500)
   }
 
 

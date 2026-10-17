@@ -1,9 +1,25 @@
 services:
   server:
     container_name: nest-server
+
     build: .
+    networks:
+      - no_name
     env_file:
       - .env.test_supabase
     ports:
       - "3000:3000"
     restart: unless-stopped
+
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "127.0.0.1:24224"
+        fluentd-async: "true"
+        fluentd-sub-second-precision: "true"
+        tag: "nestjs"
+
+
+networks:
+  no_name:
+    external: true
