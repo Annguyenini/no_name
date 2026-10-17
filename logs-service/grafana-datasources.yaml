@@ -1,0 +1,19 @@
+# grafana-datasources.yaml
+# Configures Loki as a data source with trace correlation
+
+apiVersion: 1
+
+datasources:
+  - name: Loki
+    type: loki
+    access: proxy
+    # -MIMO: Route Grafana's datasource requests to Loki through Compose DNS.
+    url: http://loki:3100
+    jsonData:
+      # Enable derived fields to extract trace IDs from labels or structured metadata
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: "trace[_]?id"
+          name: TraceID
+          url: "$${__value.raw}"
+          matcherType: label

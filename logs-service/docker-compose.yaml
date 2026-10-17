@@ -1,0 +1,58 @@
+# docker-compose.yaml
+# Runs Loki, the OTel Collector, and Grafana for log visualization
+
+version: "3.8"
+
+services:
+  loki:
+    image: grafana/loki:latest
+    command: ["-config.file=/etc/loki.yaml","-config.expand-env=true"]
+    networks:
+      - no_name
+    env_file:
+      .env
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
+    volumes:
+      - ./loki-config.yaml:/etc/loki.yaml
+      - loki-data:/loki
+    ports:
+      - "127.0.0.1:3100:3100"
+      - "127.0.0.1:7946:7946/tcp"
+      - "127.0.0.1:7946:7946/udp"
+      - "127.0.0.1:9095:9095"
+  fluent-bit:
+      image: fluent/fluent-bit:4.2
+      networks:
+        - no_name
+      ports:
+        - "127.0.0.1:24224:24224"
+      volumes:
+        - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      depends_on:
+        - loki
+      restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    networks:
+      - no_name
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - loki
+
+
+networks:
+  no_name:
+    external: true
+volumes:
+  loki-data:
+  grafana-data:
