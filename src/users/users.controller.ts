@@ -43,12 +43,11 @@ export class UsersController {
   @UseGuards(SupabaseGuard)
   @Post("/create-profile")
   @UseFilters(AllExceptionsHandler)
-  async createProfile(@Req() request:AuthenticatedRequest,@Body() profile:CreateProfileDTO ) {
+  async createProfile(@Req() request: AuthenticatedRequest, @Body() profile: CreateProfileDTO) {
     if (!request.user || !request.user.id) throw new UnauthorizedException()
-    const user = new UserDTO()
-    user.id = request.user.id
-    user.username = profile.username
-    user.display_name = profile.display_name
+    const user = Object.assign(new UserDTO(),{
+      id: request.user.id,
+      ...request})
     const created = await this.users_service.createProfile(user)
     return created
   }
