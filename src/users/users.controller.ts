@@ -6,6 +6,7 @@ import type { AuthenticatedRequest } from '../core/global-types/authenticated-us
 import { AllExceptionsHandler } from '../interceptors/all-exceptions-handler.intercept.js';
 import { CreateProfileDTO } from './dto/create-profile.dto.js';
 import { UpdateDisplayNameDTO } from './dto/update-display-name.dto.js';
+import { request } from 'express';
 @Controller('users')
 @UsePipes(
   new ValidationPipe({
@@ -50,5 +51,14 @@ export class UsersController {
       ...request})
     const created = await this.users_service.createProfile(user)
     return created
+  }
+
+  @UseGuards(SupabaseGuard)
+  @Get("/avatar/upload-url")
+  @UseFilters(AllExceptionsHandler)
+  async requestUpdateAvatar(@Req() request: AuthenticatedRequest) {
+    if (!request.user || !request.user.id) throw new UnauthorizedException()
+    const url = await this.users_service.requestAvatarUploadurl(request.user.id)
+    return url
   }
 }

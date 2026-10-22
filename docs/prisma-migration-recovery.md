@@ -1,5 +1,23 @@
 # Prisma migration recovery
 
+## Prisma ownership boundary
+
+Prisma Client needs models for some Supabase Auth tables because application tables reference `auth.users` and the API reads Auth records. Those models remain in `prisma/schema.prisma`, but `prisma.config.ts` declares every `auth` table and enum as externally managed. Prisma Client can still query them; Prisma Migrate ignores them when calculating and applying new migrations.
+
+`externalTables` is a Prisma preview feature. Keep the lists in `prisma.config.ts` aligned with the `@@schema("auth")` models and enums. The unit test `prisma/prisma-config.spec.ts` checks that every Auth model and enum is listed.
+
+The historical `0_init` migration contains Supabase Auth DDL because it was reconstructed from the existing database. Do not edit or delete that migration: it is already recorded as applied in the deployed databases. Existing projects must retain their baseline history. For any new Supabase project, verify and baseline its existing managed Auth objects before deploying this migration history; do not let Prisma replay the historical Auth DDL against tables Supabase already created.
+
+## Future migration flow
+
+1. Make application schema changes in `prisma/schema.prisma`; leave Supabase-managed Auth models and enums unchanged unless Supabase changes them.
+2. Generate a migration against a disposable development database with `npx prisma migrate dev --name <change-name>`. Do not use a shared Supabase test or production database for migration development or reset.
+3. Review the generated `migration.sql`. It should change only app-owned objects in `users`, `permission`, and `friendships`.
+4. Apply the reviewed migration to the test database and production with `npx prisma migrate deploy` after confirming the configured URL targets the intended environment.
+5. Confirm with `npx prisma migrate status`.
+
+`DIRECT_URL` takes precedence over `DATABASE_URL` in `prisma.config.ts`; verify both when checking the migration target. Never use `prisma migrate reset` against a shared Supabase project. A reset can partially remove app tables and then fail on Auth tables that the database role does not own.
+
 ## Supabase generated columns
 
 Supabase has several generated columns in its `auth` schema. PostgreSQL rejects `DEFAULT` expressions that refer to another column. In migration SQL, represent these as generated columns:
@@ -20,4 +38,4 @@ The configured Supabase database contained two applied baseline markers, `0_init
 
 The live Prisma schema diff confirmed the only pending schema change was `users.users.avatar_properties`. The additive migration was deployed to Supabase and `migrate status` confirmed the history is up to date. Do not run `migrate reset` against a shared or production database.
 
-For Supabase, run `migrate dev` against a development database, then apply reviewed migrations to the shared database with `prisma migrate deploy`. Do not point `migrate dev` at the shared database. The `20261022-add-avatar-properties` migration adds a nullable `JSONB` column; its expected change is `users.users.avatar_properties`.
+The `20261022-add-avatar-properties` migration adds a nullable `JSONB` column; its expected change is `users.users.avatar_properties`.

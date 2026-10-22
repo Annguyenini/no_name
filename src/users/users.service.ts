@@ -1,7 +1,7 @@
 import { ConflictException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserDTO } from './dto/user.dto.js';
 import { UserRepositoryService } from './users.repository.service.js';
-import { RepositoryExceptions } from '../core/exceptions/app-exceptions.js';
+import { AWSExceptions, RepositoryExceptions } from '../core/exceptions/app-exceptions.js';
 import { ContentsService } from '../contents/contents.service.js';
 import { ContentsRepositoryService } from '../contents/contents.repository.service.js';
 
@@ -47,9 +47,13 @@ export class UsersService {
       throw new RepositoryExceptions("user",err,`Failed to get create profile`,400)
     }
   }
-  async requestUpdateAvatar(id: string, avatar_id: string) {
+  async requestAvatarUploadurl(id: string) {
     try {
-      const request_urls = await this.contents_service
+      const url =await this.user_repository.requestAvatarUploadURL(id)
+      return {"url":url}
+    }
+    catch (err) {
+      throw new AWSExceptions(`Failed to generate upload url: ${err}`,`Failed to generate upload url`)
     }
   }
 }

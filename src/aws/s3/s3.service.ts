@@ -1,8 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable, NotFoundException } from "@nestjs/common";
 import { S3InstanceService } from "./s3.instance.service.js";
 import * as AWS from 'aws-sdk';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { UploadObject } from "./s3.object.js";
+
+
 
 @Injectable()
 export class S3Service {
@@ -22,14 +25,31 @@ export class S3Service {
       return s3Response;
   }
 
-  async generateUploadUrl(bucket: string, key: string, content_type: string) {
+  async generateUploadUrl(object: UploadObject) {
+    const object_pro = object.getUploadObject()
     const command = new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      ContentType:content_type
+      Bucket: object_pro.bucket,
+      Key: object_pro.key,
+      ContentType:object_pro.content_type
     })
 
     const request = await getSignedUrl(this.s3_instance, command, { expiresIn: 300 })
     return request
+  }
+  async objectExists(bucket: string, key: string) {
+    try {
+      await this.s3_instance.send(
+        new HeadObjectCommand({Bucket:bucket,Key:key})
+      )
+      return true
+    }
+    catch (err) {
+      const status_code = (err as {$metadata? : {httpStatusCode?: number}}).$metadata?.httpStatusCode ?? 500
+      if (status_code === 404) {
+        // not found
+        return false
+      }
+      throw err
+    }
   }
 }

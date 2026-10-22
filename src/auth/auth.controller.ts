@@ -37,7 +37,6 @@ export class AuthController {
   @Post("/signin")
   @UseFilters(AllExceptionsHandler)
   async signIn(@Body() user: SignInDTO) {
-    console.log(user)
     return await this.auth_service.signIn(user)
   }
 
