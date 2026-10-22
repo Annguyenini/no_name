@@ -2,10 +2,13 @@ import { ConflictException, HttpException, Injectable, NotFoundException } from 
 import { UserDTO } from './dto/user.dto.js';
 import { UserRepositoryService } from './users.repository.service.js';
 import { RepositoryExceptions } from '../core/exceptions/app-exceptions.js';
+import { ContentsService } from '../contents/contents.service.js';
+import { ContentsRepositoryService } from '../contents/contents.repository.service.js';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly user_repository: UserRepositoryService) { }
+  constructor(private readonly user_repository: UserRepositoryService,
+    private readonly contents_repository_service: ContentsRepositoryService) { }
 
   async getMyProfile(id: string) {
     const profile = await this.user_repository.getUserById(id);
@@ -44,5 +47,9 @@ export class UsersService {
       throw new RepositoryExceptions("user",err,`Failed to get create profile`,400)
     }
   }
-
+  async requestUpdateAvatar(id: string, avatar_id: string) {
+    try {
+      const request_urls = await this.contents_service
+    }
+  }
 }

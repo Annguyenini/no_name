@@ -53,3 +53,14 @@ export class RepositoryExceptions extends AppException{
     super(name,internalMessage,externalMessage, statusCode)
   }
 }
+
+
+export class AWSExceptions extends AppException{
+  constructor(
+    public readonly internalMessage: any,
+    public readonly externalMessage: string
+  ) {
+    super("AWS",internalMessage,externalMessage,500)
+
+  }
+}

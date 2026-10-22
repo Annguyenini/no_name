@@ -33,13 +33,13 @@ export class ConfigService {
   getAwsConfig(): AWSConfigDTO {
     const aws_access_key = process.env.AWS_ACCESS_KEY;
     const aws_secret_access_key = process.env.AWS_SECRET_ACCESS_KEY;
-
-    if (!aws_access_key || !aws_secret_access_key) {
+    const aws_region= process.env.AWS_REGION
+    if (!aws_access_key || !aws_secret_access_key||!aws_region  ) {
       throw new Error(
-        'AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY must be set in the environment',
+        'AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY and AWS_REGION must be set in the environment',
       );
     }
 
-    return new AWSConfigDTO(aws_access_key, aws_secret_access_key);
+    return new AWSConfigDTO(aws_access_key, aws_secret_access_key,aws_region);
   }
 }

@@ -2,9 +2,11 @@ import { ConflictException, Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { UserDTO } from "./dto/user.dto.js";
 import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
+import { ContentsRepositoryService } from "../contents/contents.repository.service.js";
 @Injectable()
 export class UserRepositoryService{
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService,
+   private readonly contents_repository_service :ContentsRepositoryService) { }
 
   async getUserByUsername(username: string): Promise<UserDTO | null> {
     const response = await this.prisma.users.findUnique({
@@ -68,5 +70,11 @@ export class UserRepositoryService{
       throw err
     }
   }
-
+  async requestAvatarUploadURL(user_id: string, avatar_id: string) {
+    const key = `avatar-${user_id}`
+    const bucket = `avatars`
+    const content_type = 'image/jpeg'
+    const request = await this.contents_repository_service.requestUploadUrls(key, bucket, content_type)
+    return request
+  }
 }
