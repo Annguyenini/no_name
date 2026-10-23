@@ -61,4 +61,12 @@ export class UsersController {
     const url = await this.users_service.requestAvatarUploadurl(request.user.id)
     return url
   }
+
+  @UseGuards(SupabaseGuard)
+  @Get("/avatar/validate-upload")
+  @UseFilters(AllExceptionsHandler)
+  async requestValidateUplaodedAvatar(@Req() request: AuthenticatedRequest) {
+    if (!request.user || !request.user.id) throw new UnauthorizedException()
+    return await this.users_service.checkUploadedAvatar(request.user.id)
+  }
 }

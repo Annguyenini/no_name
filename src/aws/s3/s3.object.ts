@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from "@nestjs/common"
-import { UploadObjectDTO } from "./dto/upload-object.dto.js"
+import { S3Object } from "./dto/object.js"
+
 
 
 export abstract class UploadObject{
-  abstract getUploadObject(): UploadObjectDTO;
+  abstract getUploadObject(): any;
 }
 @Injectable()
 export class AvatarUploadObject implements UploadObject {
@@ -16,11 +17,12 @@ export class AvatarUploadObject implements UploadObject {
     this.key = `avatar/${user_id}.jpg`
     this.content_type = "image/jpg"
   }
-  getUploadObject(): UploadObjectDTO {
-    return new UploadObjectDTO(
-      this.bucket,
-      this.key,
-      this.content_type,
-    );
+  getUploadObject(): S3Object {
+    const object: S3Object = {
+      bucket:this.bucket,
+      key:this.key,
+      content_type:this.content_type,
+      };
+  return object
   }
 }

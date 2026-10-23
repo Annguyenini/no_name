@@ -1,4 +1,4 @@
-import { ConflictException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserDTO } from './dto/user.dto.js';
 import { UserRepositoryService } from './users.repository.service.js';
 import { AWSExceptions, RepositoryExceptions } from '../core/exceptions/app-exceptions.js';
@@ -55,5 +55,11 @@ export class UsersService {
     catch (err) {
       throw new AWSExceptions(`Failed to generate upload url: ${err}`,`Failed to generate upload url`)
     }
+  }
+
+  async checkUploadedAvatar(user_id: string) {
+    const url = await this.user_repository.checkAvatarUploadURL(user_id)
+    if (!url) throw new BadRequestException(`Avatar not uploaded`)
+    return {"message":"success"}
   }
 }

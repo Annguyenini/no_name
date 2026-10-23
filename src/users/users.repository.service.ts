@@ -3,7 +3,6 @@ import { PrismaService } from "../prisma/prisma.service.js";
 import { UserDTO } from "./dto/user.dto.js";
 import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
 import { ContentsRepositoryService } from "../contents/contents.repository.service.js";
-import { UploadObjectDTO } from "../aws/s3/dto/upload-object.dto.js";
 import { AvatarUploadObject } from "../aws/s3/s3.object.js";
 @Injectable()
 
@@ -82,6 +81,8 @@ export class UserRepositoryService{
     return request
   }
   async checkAvatarUploadURL(user_id: string) {
-
+    const object = new AvatarUploadObject(user_id)
+    const exists = await this.contents_repository_service.objectExists(object)
+    return exists
   }
 }

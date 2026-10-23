@@ -36,10 +36,12 @@ export class S3Service {
     const request = await getSignedUrl(this.s3_instance, command, { expiresIn: 300 })
     return request
   }
-  async objectExists(bucket: string, key: string) {
+  async objectExists(object: UploadObject) {
+    const object_pro = object.getUploadObject()
+
     try {
       await this.s3_instance.send(
-        new HeadObjectCommand({Bucket:bucket,Key:key})
+        new HeadObjectCommand({Bucket:object_pro.bucket,Key:object_pro.key})
       )
       return true
     }
