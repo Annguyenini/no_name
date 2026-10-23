@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, Req, UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import type { Request } from "express";
 import { AllExceptionsHandler } from '../interceptors/all-exceptions-handler.intercept.js';
 import { UsersService } from '../users/users.service.js';
@@ -8,7 +8,6 @@ import { SignUpDTO } from './dto/signup.dto.js';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseGuard } from '../supabase/supabase.guard.js';
 import { Email } from './dto/verify-email.sto.js';
-import { RefreshTokenDTO } from './dto/refresh-token.dto.js';
 import type{ AuthenticatedRequest } from '../core/global-types/authenticated-user.js';
 import { AppException } from '../core/exceptions/app-exceptions.js';
 
@@ -23,7 +22,7 @@ import { AppException } from '../core/exceptions/app-exceptions.js';
 export class AuthController {
   constructor (private readonly auth_service:AuthService){}
   // sign up\
-  @Post("/signup")
+  @Post("/sign-up")
   @UseFilters(AllExceptionsHandler)
   async signUp(@Body() user: SignUpDTO){
     return await this.auth_service.signUp(user)
@@ -34,16 +33,21 @@ export class AuthController {
   //   return await this.auth_service.emailVerification(body)
   // }
   //Sign in
-  @Post("/signin")
+  @Post("/sign-in")
   @UseFilters(AllExceptionsHandler)
   async signIn(@Body() user: SignInDTO) {
     return await this.auth_service.signIn(user)
   }
 
-  @Post('/refresh-token')
+  @Get('/refresh-token')
   @UseFilters(AllExceptionsHandler)
-  async refreshToken(@Body() body: RefreshTokenDTO) {
-    return this.auth_service.requestNewAccessToken(body.refresh_token);
+  // -MIMO: Read the refresh credential from the bearer header and reject missing or malformed credentials.
+  async refreshToken(@Headers('authorization') authorization: string | undefined) {
+    const match = authorization?.match(/^Bearer\s+(.+)$/i);
+    const refresh_token = match?.[1]?.trim();
+    if (!refresh_token) throw new UnauthorizedException('Missing or invalid refresh token');
+
+    return this.auth_service.requestNewAccessToken(refresh_token);
   }
 
   @Post('/signout')

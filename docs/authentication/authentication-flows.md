@@ -4,7 +4,7 @@ All routes use the `/auth` prefix. Request bodies are validated; unknown fields 
 
 ## Sign up
 
-`POST /auth/signup`
+`POST /auth/sign-up`
 
 Send an email and a password with at least 8 characters, including uppercase, lowercase, number, and symbol characters. The same password validation applies when signing in.
 
@@ -27,7 +27,7 @@ Supabase handles account creation and email confirmation. The API returns the ne
 
 ## Sign in
 
-`POST /auth/signin`
+`POST /auth/sign-in`
 
 Send the account email as `identifier` and the password:
 
@@ -52,15 +52,12 @@ Keep both tokens private. Use the access token as a bearer token for protected r
 
 ## Refresh tokens
 
-`POST /auth/refresh-token`
+`GET /auth/refresh-token`
 
-Send the current refresh token in the JSON body:
+Send the current refresh token in the bearer authorization header. No JSON body is required:
 
-```json
-{
-  "access_toke":"...",
-  "refresh_token": "..."
-}
+```http
+Authorization: Bearer <refresh_token>
 ```
 
 Response has the same shape as sign-in. Replace both stored tokens with the returned tokens, since Supabase may rotate the refresh token.

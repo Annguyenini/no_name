@@ -31,7 +31,7 @@ describe('LoggingInterceptor', () => {
   });
 
   it('logs requests that fail and uses the socket IP when request.ip is empty', () => {
-    const context = createHttpContext('POST', '/auth/signin', '', '192.0.2.5');
+    const context = createHttpContext('POST', '/auth/sign-in', '', '192.0.2.5');
     const call_handler = {
       handle: () => throwError(() => new Error('request failed')),
     } as CallHandler;
@@ -42,7 +42,7 @@ describe('LoggingInterceptor', () => {
 
     expect(log_spy).toHaveBeenCalledOnce();
     expect(log_spy.mock.calls[0][0]).toMatch(
-      /^Request POST \/auth\/signin ip=192\.0\.2\.5 \d+ms$/,
+      /^Request POST \/auth\/sign-in ip=192\.0\.2\.5 \d+ms$/,
     );
   });
 });

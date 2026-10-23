@@ -56,13 +56,10 @@ export class UsersService {
     }
   }
 
-  async checkUploadedAvatar(user_id: string) {
+  async validateUpdateAvatarProperties(user_id: string,avatar_properties:any) {
     const url = await this.user_repository.checkAvatarUploadURL(user_id)
     if (!url) throw new BadRequestException(`Avatar not uploaded`)
-    return {"message":"success"}
-  }
-  async updateUserAvatar(id: string, avatar_properties: any) {
-    const response = await this.user_repository.updateUserAvatarProperties(id, avatar_properties)
+    const response = await this.user_repository.updateUserAvatarProperties(user_id, avatar_properties)
     if (!response) throw new NotFoundException('Failed to update avatar properties')
     return response
   }

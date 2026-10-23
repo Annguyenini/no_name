@@ -6,13 +6,9 @@ import { AppModule } from './../src/app.module.js';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
-<<<<<<< HEAD
-  var legit_email = "testvl@gmail.com"
-  var legit_password = "Testing11234@"
-=======
+
   var legit_email = process.env.LEGIT_EMAIL_TEST
   var legit_password = process.env.LEGIT_PASSWORD_TEST
->>>>>>> fd4444f (auth e2e test)
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -25,20 +21,20 @@ describe('AppController (e2e)', () => {
   afterAll(async () => {
     await app.close();
   });
-  describe('POST/signup', () => {
+  describe('POST/sign-up', () => {
     it('Should return 400', () => {
       return request(app.getHttpServer())
-        .post('/auth/signup')
+        .post('/auth/sign-up')
         .send({"email":"dsdsdsd",
             "password":"dsdsdsds"})
         .expect(400)
 
     })
   })
-  describe('POST/signup', () => {
+  describe('POST/sign-up', () => {
     it('Should create a new user ', () => {
       return request(app.getHttpServer())
-        .post('/auth/signup')
+        .post('/auth/sign-up')
         .send({"email":legit_email,
             "password":legit_password})
         .expect(201)
@@ -48,20 +44,20 @@ describe('AppController (e2e)', () => {
     })
   })
 
-  describe('POST/signin', () => {
+  describe('POST/sign-in', () => {
     it('Should return 400', () => {
       return request(app.getHttpServer())
-        .post('/auth/signup')
+        .post('/auth/sign-up')
         .send({"identifier":"dsdsdsd",
             "password":"dsdsdsds"})
         .expect(400)
 
     })
   })
-  describe('POST/signin', () => {
+  describe('POST/sign-in', () => {
     it('Should create a new user ', () => {
       return request(app.getHttpServer())
-        .post('/auth/signin')
+        .post('/auth/sign-in')
         .send({"identifier":legit_email,
             "password":legit_password})
         .expect(201)
@@ -70,10 +66,10 @@ describe('AppController (e2e)', () => {
         })
     })
   })
-  describe('POST/signin', () => {
+  describe('POST/sign-in', () => {
     it('Should return 401', () => {
       return request(app.getHttpServer())
-        .post('/auth/signin')
+        .post('/auth/sign-in')
         .send({"identifier":legit_email,
             "password":"OigioiOi112ww@"})
         .expect(401)

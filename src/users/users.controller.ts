@@ -53,6 +53,7 @@ export class UsersController {
     return created
   }
 
+  // request url for upload avatar
   @UseGuards(SupabaseGuard)
   @Get("/avatar/upload-url")
   @UseFilters(AllExceptionsHandler)
@@ -63,19 +64,11 @@ export class UsersController {
   }
 
   @UseGuards(SupabaseGuard)
-  @Get("/avatar/validate-upload")
+  @Patch("/avatar/validate-upload")
   @UseFilters(AllExceptionsHandler)
-  async requestValidateUploadedAvatar(@Req() request: AuthenticatedRequest) {
+  async requestValidateUploadedAvatar(@Req() request: AuthenticatedRequest, @Body() body: any) {
     if (!request.user || !request.user.id) throw new UnauthorizedException()
-    return await this.users_service.checkUploadedAvatar(request.user.id)
+    return await this.users_service.validateUpdateAvatarProperties(request.user.id,body)
   }
 
-
-  @UseGuards(SupabaseGuard)
-  @Patch("/avatar/avatar-properties")
-  @UseFilters(AllExceptionsHandler)
-  async updateAvatarProperties(@Req() request: AuthenticatedRequest, @Body() body: any) {
-    return this.users_service.updateUserAvatar(id, avatar_properties)
-  }
-  }
 }

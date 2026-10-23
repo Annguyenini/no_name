@@ -34,3 +34,12 @@ Avatar support is planned but deferred until the user returns to it. Profile cre
 - The current proposal uses `PATCH /users/update-avatar` to confirm and save the uploaded object key. The earlier draft used `POST` for this step; settle the method and final route when implementation begins.
 - Decide how to clean up an uploaded object if confirmation fails, or configure an S3 lifecycle rule for unused avatar objects.
 - Keep the upload limited to one media object per request.
+
+### Upload size and object verification
+
+- Set the maximum avatar size to **5 MiB** (`5 * 1024 * 1024` bytes) in the upload policy. A presigned `PUT` URL does not enforce a reliable maximum size; use a presigned `POST` with an S3 `content-length-range` condition, or upload through the backend if the limit must be enforced before storage.
+- After upload, verify the object server-side with `HeadObject` before confirming it. Check `ContentLength` is within the allowed range and `ContentType` is an allowed image type; reject the confirmation if either check fails.
+- S3 metadata does not verify the file's real format or image dimensions. If those matter, read and decode the object with an image parser (or scan/process it) before saving its properties.
+- Save only verified server-side properties and the object key. Do not trust client-supplied size or content type as proof of the uploaded file.
+
+For the implementation follow-up checklist, see [the avatar upload comeback note](../comeback/avatar-upload.md).
