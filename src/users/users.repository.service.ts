@@ -51,7 +51,21 @@ export class UserRepositoryService{
       throw err;
     }
   }
-
+  async updateUserAvatarProperties(id: string, avatar_properties: any) {
+    try {
+      const response = await this.prisma.users.update({
+        where: { id },
+        data:{avatar_properties}
+      })
+      return response
+    }
+    catch (err) {
+      if (err instanceof PrismaClientKnownRequestError && err.code === "P2025") {
+        return null
+      }
+      throw err
+    }
+  }
   async insertNewUser(user: UserDTO): Promise<UserDTO> {
     try{
     const success = await this.prisma.users.create({

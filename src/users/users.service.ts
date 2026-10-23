@@ -31,7 +31,6 @@ export class UsersService {
     if (!profile) throw new NotFoundException('Profile not found');
     return profile;
   }
-
   async createProfile(user: UserDTO) {
     try {
       const existingProfile = await this.user_repository.getUserById(user.id)
@@ -62,4 +61,10 @@ export class UsersService {
     if (!url) throw new BadRequestException(`Avatar not uploaded`)
     return {"message":"success"}
   }
+  async updateUserAvatar(id: string, avatar_properties: any) {
+    const response = await this.user_repository.updateUserAvatarProperties(id, avatar_properties)
+    if (!response) throw new NotFoundException('Failed to update avatar properties')
+    return response
+  }
+
 }

@@ -48,7 +48,7 @@ export class UsersController {
     if (!request.user || !request.user.id) throw new UnauthorizedException()
     const user = Object.assign(new UserDTO(),{
       id: request.user.id,
-      ...request})
+      ...profile})
     const created = await this.users_service.createProfile(user)
     return created
   }
@@ -65,8 +65,17 @@ export class UsersController {
   @UseGuards(SupabaseGuard)
   @Get("/avatar/validate-upload")
   @UseFilters(AllExceptionsHandler)
-  async requestValidateUplaodedAvatar(@Req() request: AuthenticatedRequest) {
+  async requestValidateUploadedAvatar(@Req() request: AuthenticatedRequest) {
     if (!request.user || !request.user.id) throw new UnauthorizedException()
     return await this.users_service.checkUploadedAvatar(request.user.id)
+  }
+
+
+  @UseGuards(SupabaseGuard)
+  @Patch("/avatar/avatar-properties")
+  @UseFilters(AllExceptionsHandler)
+  async updateAvatarProperties(@Req() request: AuthenticatedRequest, @Body() body: any) {
+    return this.users_service.updateUserAvatar(id, avatar_properties)
+  }
   }
 }
