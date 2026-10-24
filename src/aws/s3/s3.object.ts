@@ -14,7 +14,7 @@ export class AvatarUploadObject implements UploadObject {
   private object_size:number
   constructor(user_id: string) {
     if(!user_id ) throw new BadRequestException("user_id require")
-    this.bucket = `avatar`
+    this.bucket = `no-name-v1`
     this.key = `avatar/${user_id}.jpg`
     this.content_type = "image/jpg"
     this.object_size = 5 * 1024 * 1024

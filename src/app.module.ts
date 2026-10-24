@@ -25,7 +25,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     }),
     NestConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      envFilePath:'.env',
 
     }),
     AuthModule,
