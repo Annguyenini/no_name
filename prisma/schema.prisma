@@ -14,13 +14,13 @@ model users {
   username                           String        @unique
   display_name                       String
   status                             Status
-  avatar_url                         String?
+  avatar_id                          String?
   /// MIMO: Add optional JSON metadata for a user's avatar.
   avatar_properties                  Json?         @db.JsonB
   friendships_friendships_id1Tousers friendships[] @relation("friendships_id1Tousers")
   friendships_friendships_id2Tousers friendships[] @relation("friendships_id2Tousers")
   permission                         permission?
-  users                              auth_users    @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users                              auth_users    @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("users")
 }
