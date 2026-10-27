@@ -32,6 +32,16 @@ Input:
 {"id":"user-uuid","access_token":"...","refresh_token":"..."}
 ```
 
+### `GET /auth/sign-in-via-token`
+
+Send an existing Supabase access token as `Authorization: Bearer <access_token>`. The `SupabaseGuard` verifies the token before the route responds. No request body is required. A valid token returns:
+
+```json
+{"ok":true}
+```
+
+Missing or invalid bearer tokens are rejected by the authentication guard.
+
 ### `GET /auth/refresh-token`
 
 Send the refresh token as `Authorization: Bearer <refresh_token>`. No body. Returns new access and refresh tokens; replace both stored tokens because refresh tokens may rotate.
@@ -51,5 +61,6 @@ Input: `{"email":"person@example.com"}`. The route currently returns no response
 ## Notes
 
 - Sign-in, refresh, and sign-out failures use unauthorized responses for invalid credentials or tokens.
-- `/auth/test` is a guarded diagnostic route that intentionally throws an application error.
 - Keep access and refresh tokens private. Use access tokens on protected routes.
+
+<!-- -MIMO: Document the guarded token sign-in route and remove the obsolete diagnostic route note. -->

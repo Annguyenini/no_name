@@ -1,0 +1,13 @@
+name: Server
+on:
+  workflow_call:
+jobs:
+  run-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install
+        run: |
+          npm install
+      - name: Run server container
+        run: |
+          docker compose up --build

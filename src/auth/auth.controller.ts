@@ -38,7 +38,12 @@ export class AuthController {
   async signIn(@Body() user: SignInDTO) {
     return await this.auth_service.signIn(user)
   }
-
+  @UseGuards(SupabaseGuard)
+  @Get("/sign-in-via-token")
+  @UseFilters(AllExceptionsHandler)
+  async signInViaToken() {
+    return {"ok":true}
+  }
   @Get('/refresh-token')
   @UseFilters(AllExceptionsHandler)
   // -MIMO: Read the refresh credential from the bearer header and reject missing or malformed credentials.
@@ -63,12 +68,5 @@ export class AuthController {
   async resend(@Body() email:Email) {
     return await this.auth_service.resendEmailConfirmation(email)
   }
-  @UseGuards(SupabaseGuard)
-  @Get("/test")
-  @UseFilters(AllExceptionsHandler)
-  async test(@Req() request: AuthenticatedRequest) {
-    throw new AppException('auth',"testting","testting",500)
-  }
-
 
 }

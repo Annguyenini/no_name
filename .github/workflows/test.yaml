@@ -1,0 +1,13 @@
+name: Test
+on:
+  workflow_call
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install
+        run: |
+          npm install
+      - name: Run test
+        run: |
+          npm run test:e2e
