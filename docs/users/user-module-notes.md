@@ -42,4 +42,6 @@ Avatar support is planned but deferred until the user returns to it. Profile cre
 - S3 metadata does not verify the file's real format or image dimensions. If those matter, read and decode the object with an image parser (or scan/process it) before saving its properties.
 - Save only verified server-side properties and the object key. Do not trust client-supplied size or content type as proof of the uploaded file.
 
+The user repository delegates upload URL tracking and object verification to `ContentsRepositoryService`. That shared repository checks the pending request owner and expiry, reads S3 metadata, enforces the object's declared content type and maximum size, and consumes the pending request after successful verification.
+
 For the implementation follow-up checklist, see [the avatar upload comeback note](../comeback/avatar-upload.md).

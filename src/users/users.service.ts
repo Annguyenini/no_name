@@ -8,7 +8,7 @@ import { ContentsRepositoryService } from '../contents/contents.repository.servi
 @Injectable()
 export class UsersService {
   constructor(private readonly user_repository: UserRepositoryService,
-    private readonly contents_repository_service: ContentsRepositoryService) { }
+    ) { }
 
   async getMyProfile(id: string) {
     const profile = await this.user_repository.getUserById(id);
@@ -25,7 +25,10 @@ export class UsersService {
       display_name: profile.display_name,
     };
   }
-
+  async getUserAvatar(id: string) {
+    const access_url = await this.user_repository.getUserAvatarAccessUrl(id)
+    return {"url":access_url}
+  }
   async updateDisplayName(id: string, displayName: string) {
     const profile = await this.user_repository.updateDisplayName(id, displayName);
     if (!profile) throw new NotFoundException('Profile not found');

@@ -1,9 +1,9 @@
 import { HttpException, Injectable, NotFoundException } from "@nestjs/common";
 import { S3InstanceService } from "./s3.instance.service.js";
 import * as AWS from 'aws-sdk';
-import { S3Client, PutObjectCommand, HeadObjectCommand} from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, HeadObjectCommand, GetObjectCommand} from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { UploadObject } from "./s3.object.js";
+import { ContentObject } from "./s3.object.js";
 
 
 
@@ -25,7 +25,7 @@ export class S3Service {
       return s3Response;
   }
 
-  async generateUploadUrl(object: UploadObject) {
+  async generateUploadUrl(object: ContentObject) {
     const object_pro = object.getUploadObject()
     const command = new PutObjectCommand({
       Bucket: object_pro.bucket,
@@ -37,7 +37,16 @@ export class S3Service {
     return request
   }
 
-  async getObjectData(object: UploadObject) {
+  async generateAccessUrl(object: ContentObject,expire_in:number) {
+    const object_pro = object.getUploadObject()
+    const command = new GetObjectCommand({
+      Bucket: object_pro.bucket,
+      Key:object_pro.key
+    })
+    return getSignedUrl(this.s3_instance, command, { expiresIn: expire_in });
+  }
+
+  async getObjectData(object: ContentObject) {
     const object_pro = object.getUploadObject()
 
     try {

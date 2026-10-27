@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 
-interface UploadRequest{
+export interface UploadRequest{
   user_id: string,
   key: string,
   content_type: string
@@ -10,8 +10,8 @@ interface UploadRequest{
 export class UploadRequests{
   private upload_map = new Map<string,UploadRequest>()
 
-  addObjectIntoMap(key: string, object: UploadRequest) {
-    return this.upload_map.set(key, object)
+  addObjectIntoMap(key: string, object: UploadRequest): void {
+    this.upload_map.set(key, object)
   }
   getObjectFromMap(key: string) {
     return this.upload_map.get(key)

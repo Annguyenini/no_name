@@ -24,11 +24,22 @@ export class UsersController {
     if (!request.user?.id) throw new UnauthorizedException();
     return this.users_service.getMyProfile(request.user.id);
   }
-
+  @UseGuards(SupabaseGuard)
+  @Get('/me/avatar')
+  async getMyAvatar(@Req() request: AuthenticatedRequest) {
+    if (!request.user?.id) throw new UnauthorizedException();
+    return this.users_service.getUserAvatar(request.user.id);
+  }
   @UseGuards(SupabaseGuard)
   @Get('/user')
   async getUserProfile(@Query('user_id', new ParseUUIDPipe()) userId: string) {
     return this.users_service.getPublicProfile(userId);
+  }
+
+  @UseGuards(SupabaseGuard)
+  @Get('/avatar')
+  async getUserAvatar(@Query('user_id', new ParseUUIDPipe()) userId: string) {
+    return this.users_service.getUserAvatar(userId);
   }
 
   @UseGuards(SupabaseGuard)

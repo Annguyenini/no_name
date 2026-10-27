@@ -1,105 +1,55 @@
 # Auth module
 
-All routes use the `/auth` prefix. Request bodies are validated; unknown fields are rejected.
+All routes use `/auth`. Request bodies are validated; unknown fields are rejected.
 
-## Sign up
+## Routes
 
-`POST /auth/sign-up`
+### `POST /auth/sign-up`
 
-Send an email and a password with at least 8 characters, including uppercase, lowercase, number, and symbol characters. The same password validation applies when signing in.
-
-```json
-{
-  "email": "person@example.com",
-  "password": "Example123!"
-}
-```
-
-Response:
+Input:
 
 ```json
-{
-  "id": "user-uuid"
-}
+{"email":"person@example.com","password":"Example123!"}
 ```
 
-Supabase handles account creation and email confirmation. The API returns the new user ID.
-
-## Sign in
-
-`POST /auth/sign-in`
-
-Send the account email as `identifier` and the password:
+Password requires at least 8 characters, including uppercase, lowercase, number, and symbol. Returns:
 
 ```json
-{
-  "identifier": "person@example.com",
-  "password": "Example123!"
-}
+{"id":"user-uuid"}
 ```
 
-Response:
+### `POST /auth/sign-in`
+
+Input:
 
 ```json
-{
-  "id": "user-uuid",
-  "access_token": "...",
-  "refresh_token": "..."
-}
+{"identifier":"person@example.com","password":"Example123!"}
 ```
 
-Keep both tokens private. Use the access token as a bearer token for protected routes.
-
-## Refresh tokens
-
-`GET /auth/refresh-token`
-
-Send the current refresh token in the bearer authorization header. No JSON body is required:
-
-```http
-Authorization: Bearer <refresh_token>
-```
-
-Response has the same shape as sign-in. Replace both stored tokens with the returned tokens, since Supabase may rotate the refresh token.
-
-## Sign out
-
-`POST /auth/signout`
-
-Send the current access token in the header. No request body is needed.
-
-```http
-Authorization: Bearer <access_token>
-```
-
-Response:
+`identifier` is the account email. Returns:
 
 ```json
-{
-  "message": "Signed out successfully"
-}
+{"id":"user-uuid","access_token":"...","refresh_token":"..."}
 ```
 
-This signs out the current session. The access token can remain valid until it expires.
+### `GET /auth/refresh-token`
 
-## Resend verification email
+Send the refresh token as `Authorization: Bearer <refresh_token>`. No body. Returns new access and refresh tokens; replace both stored tokens because refresh tokens may rotate.
 
-`POST /auth/resend-email-verification`
+### `POST /auth/signout`
 
-Send the account email:
+Send `Authorization: Bearer <access_token>`. Returns:
 
 ```json
-{
-  "email": "person@example.com"
-}
+{"message":"Signed out successfully"}
 ```
 
-The controller currently defines no response body for this route.
+### `POST /auth/resend-email-verification`
 
-## Protected test route
+Input: `{"email":"person@example.com"}`. The route currently returns no response body.
 
-`GET /auth/test` requires `Authorization: Bearer <access_token>`. It currently returns no response body.
+## Notes
 
-## Roles
-
-The Prisma role enum contains `user` and `admin`. A permission row uses the app user ID from `users.users(id)`; this is separate from Supabase's `auth.users` table. The auth controller currently has no endpoint to assign or change roles.
+- Sign-in, refresh, and sign-out failures use unauthorized responses for invalid credentials or tokens.
+- `/auth/test` is a guarded diagnostic route that intentionally throws an application error.
+- Keep access and refresh tokens private. Use access tokens on protected routes.
