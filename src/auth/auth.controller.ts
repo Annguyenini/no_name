@@ -41,8 +41,9 @@ export class AuthController {
   @UseGuards(SupabaseGuard)
   @Get("/sign-in-via-token")
   @UseFilters(AllExceptionsHandler)
-  async signInViaToken() {
-    return {"ok":true}
+  // -MIMO: Return the user ID attached by the Supabase token guard after token verification.
+  async signInViaToken(@Req() request: AuthenticatedRequest) {
+    return { user_id: request.user.id };
   }
   @Get('/refresh-token')
   @UseFilters(AllExceptionsHandler)

@@ -37,7 +37,7 @@ Input:
 Send an existing Supabase access token as `Authorization: Bearer <access_token>`. The `SupabaseGuard` verifies the token before the route responds. No request body is required. A valid token returns:
 
 ```json
-{"ok":true}
+{"user_id":"user-uuid"}
 ```
 
 Missing or invalid bearer tokens are rejected by the authentication guard.
