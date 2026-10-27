@@ -115,6 +115,8 @@ describe('AppController (e2e)', () => {
         .send({ avatar_url: avatarUrl })
         .expect(200);
     },25000);
-
   });
-});
+
+})
+// confirm the upload avatar acctually image, need get data, confirm, and check if update display name work
+// consider adding upload check

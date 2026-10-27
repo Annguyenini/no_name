@@ -1,16 +1,19 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { BadGatewayException, BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { UserDTO } from "./dto/user.dto.js";
 import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
 import { ContentsRepositoryService } from "../contents/contents.repository.service.js";
 import { AvatarUploadObject } from "../aws/s3/s3.object.js";
+import { UploadRequests } from "../contents/contents-requests.service.js";
+import { AppException } from "../core/exceptions/app-exceptions.js";
 @Injectable()
 
 
 
 export class UserRepositoryService{
   constructor(private readonly prisma: PrismaService,
-   private readonly contents_repository_service :ContentsRepositoryService) { }
+    private readonly contents_repository_service: ContentsRepositoryService,
+    private readonly upload_requests_list : UploadRequests) { }
 
   async getUserByUsername(username: string): Promise<UserDTO | null> {
     const response = await this.prisma.users.findUnique({
@@ -91,12 +94,40 @@ export class UserRepositoryService{
   async requestAvatarUploadURL(user_id: string) {
 
     const object = new AvatarUploadObject(user_id)
+    // check if the request for this key exists in the list
+    const object_pre = object.getUploadObject()
+    const exists = this.upload_requests_list.getObjectFromMap(object_pre.key)
+    // if exists and not expire, throw error
+    if (exists) {
+      if (exists.expire_at && Date.now() < exists.expire_at) throw new BadGatewayException("Request already in the queue")
+    }
+
     const request = await this.contents_repository_service.requestUploadUrls(object)
+    // if successfully request the url, add into upload set
+    if (!this.upload_requests_list.addObjectIntoMap(object_pre.key, {
+      user_id: user_id,
+      key: object_pre.key,
+      content_type: "image/jpeg",
+      // expire within 5 mins
+      expire_at: Date.now()+5*60*1000
+    })) throw new AppException("request upload url","Failed to add upload request into queue","Failed to generate upload url",500)
     return request
   }
   async checkAvatarUploadURL(user_id: string) {
     const object = new AvatarUploadObject(user_id)
-    const exists = await this.contents_repository_service.objectExists(object)
+    // check if the request in the list first
+    const object_req = object.getUploadObject()
+    const request_exists = this.upload_requests_list.getObjectFromMap(object_req.key)
+
+    if (!request_exists || request_exists.expire_at < Date.now()) throw new BadRequestException("Request not in the list or have expire")
+
+    const exists = await this.contents_repository_service.getContentData(object)
+    if(!exists) throw new BadRequestException("Upload not found")
+
+    // if avatar found, check if the size make sense and the type is correct
+    if(!exists.ContentLength || exists.ContentLength > object_req.max_content_size || exists.ContentType !==object_req.content_type)throw new BadRequestException("Object not match")
+    // if verify complete, delete from the upload list
+    if (exists) this.upload_requests_list.deleteObjectFromMap(object_req.key)
     return exists
   }
 }

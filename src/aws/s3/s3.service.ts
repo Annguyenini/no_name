@@ -37,20 +37,19 @@ export class S3Service {
     return request
   }
 
-  async objectExists(object: UploadObject) {
+  async getObjectData(object: UploadObject) {
     const object_pro = object.getUploadObject()
 
     try {
-      await this.s3_instance.send(
+      return await this.s3_instance.send(
         new HeadObjectCommand({Bucket:object_pro.bucket,Key:object_pro.key})
       )
-      return true
     }
     catch (err) {
       const status_code = (err as {$metadata? : {httpStatusCode?: number}}).$metadata?.httpStatusCode ?? 500
       if (status_code === 404) {
         // not found
-        return false
+        return null
       }
       throw err
     }
