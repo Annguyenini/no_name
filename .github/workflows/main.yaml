@@ -1,0 +1,12 @@
+name: CI
+on: [push]
+jobs:
+  Environment-Setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: create .env
+        run: base64 -d "${{ secrets.ENV_FILE }}" > .env
+  Create-database:
+    uses: ./.github/workflows/supabase.yml
