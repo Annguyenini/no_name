@@ -40,5 +40,21 @@ describe('Prisma migration ownership config', () => {
     expect(supabase_auth_external_tables).not.toContain(
       'friendships.friendships',
     );
+    expect(prisma_config.migrations?.initShadowDb).toContain(
+      'CREATE TABLE IF NOT EXISTS "auth"."users"',
+    );
+  });
+
+  // -MIMO: Keep Supabase-owned Auth DDL out of the new project's app baseline.
+  it('uses Auth only as an external foreign-key target in the fresh app baseline', () => {
+    const baseline_sql = readFileSync(
+      new URL('./migrations/0_init_supabase/migration.sql', import.meta.url),
+      'utf8',
+    );
+
+    expect(baseline_sql).not.toMatch(/CREATE SCHEMA IF NOT EXISTS "auth"/);
+    expect(baseline_sql).not.toMatch(/CREATE TYPE "auth"\./);
+    expect(baseline_sql).not.toMatch(/CREATE TABLE "auth"\./);
+    expect(baseline_sql).toContain('REFERENCES "auth"."users"("id")');
   });
 });

@@ -11,9 +11,7 @@ import { UsersController } from './users/users.controller.js';
 import { AdminModule } from './admin/admin.module.js';
 import { S3Module } from './aws/s3/s3.module.js';
 import { ContentsModule } from './contents/contents.module.js';
-import { FriendsModule } from './friends/friends.module.js';
 import { RelationshipsModule } from './relationships/relationships.module.js';
-import { RelationshipsRepositoryService } from './relationships.repository/relationships.repository.service.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 // -MIMO: Import the admin feature so its protected user-management routes are registered.
@@ -37,10 +35,10 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     SupabaseModule,
     S3Module,
     ContentsModule,
-    FriendsModule,
+
     RelationshipsModule,
   ],
   controllers: [AppController, UsersController],
-  providers: [AppService, RelationshipsRepositoryService],
+  providers: [AppService],
 })
 export class AppModule {}

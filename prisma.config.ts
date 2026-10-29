@@ -51,6 +51,11 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
+    // -MIMO: Stub the externally managed Auth key for app foreign keys during shadow migration replay.
+    initShadowDb: `
+      CREATE SCHEMA IF NOT EXISTS "auth";
+      CREATE TABLE IF NOT EXISTS "auth"."users" ("id" UUID PRIMARY KEY);
+    `,
   },
   datasource: {
     url: process.env['DIRECT_URL'] ?? process.env['DATABASE_URL'],

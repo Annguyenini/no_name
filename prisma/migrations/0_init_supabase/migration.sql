@@ -1,1 +1,2 @@
--- MIMO: Preserve the legacy applied baseline marker; 0_init is the canonical replayable schema baseline.
+-- This is an empty migration.
+
