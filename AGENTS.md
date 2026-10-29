@@ -20,3 +20,7 @@ Refrences: for files/folders use kebab-case convention: test-feature
            NESTjs references: use DTO, validate pipeline, guard if needed, and fillter for every controller
            
 NOTES: You dont have to be fast, make sure you make a right call, reuse what you can, and explain to me what you did, and why
+
+
+Make sure you also consider other situations that could make the system crash like race conditions, security risks...
+Make a security risk folder to add stuff consider as security risks or any risks to the system
