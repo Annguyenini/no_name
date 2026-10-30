@@ -21,6 +21,7 @@
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
     "test:migration": "vitest run --config ./vitest.config.migration.ts",
+    "test:smoke": "vitest run --config ./vitest.config.smoke.ts",
     "prisma:migrate:dev": "prisma migrate dev --config prisma.config.dev.ts",
     "postinstall": "prisma skills sync || exit 0"
   },
