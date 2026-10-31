@@ -7,6 +7,24 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: create .env
-        run: base64 -d "${{ secrets.ENV_FILE }}" > .env
-  Create-database:
-    uses: ./.github/workflows/supabase.yml
+        run: |
+            echo "${{ secrets.ENV_FILE }}" | base64 -d > .env
+      - name: check env
+        run: |
+            cat .env
+      - name: install dependencies
+        run: |
+            npm install
+
+      - name: migrate database
+        run: |
+            npx prisma generate
+            npx prisma migrate status
+            npx prisma migrate deploy
+            npx prisma migrate status
+            npm run test:migration
+
+      - name: Tests
+        run: |
+            npm run test:e2e
+            npm run test:smoke

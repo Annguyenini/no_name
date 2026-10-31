@@ -4,7 +4,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
-import { SupabaseModule } from './supabase/supabase.module.js';
+import { SupabaseModule } from './supabase-service/supabase.module.js';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller.js';
 import { UsersController } from './users/users.controller.js';

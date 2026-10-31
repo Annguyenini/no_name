@@ -6,7 +6,7 @@ import { BadRequestException, InternalServerErrorException, UnauthorizedExceptio
 import { CompleteSignUpDTO } from "./dto/complete-signup.dto.js";
 import { UserDTO } from "../users/dto/user.dto.js";
 import { SignInDTO } from "./dto/signin.dto.js";
-import { SupabaseService } from "../supabase/supabase.service.js";
+import { SupabaseService } from "../supabase-service/supabase.service.js";
 import { response } from "express";
 import { AppException, RepositoryExceptions, SupabaseException, SystemException } from "../core/exceptions/app-exceptions.js";
 import { Email } from "./dto/verify-email.sto.js";
