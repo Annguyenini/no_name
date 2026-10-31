@@ -10,7 +10,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AdminService } from './admin.service.js';
-import { SupabaseGuard } from '../supabase/supabase.guard.js';
+import { SupabaseGuard } from '../supabase-service/supabase.guard.js';
 import { AdminGuard } from './admin.guard.js';
 import { AllExceptionsHandler } from '../interceptors/all-exceptions-handler.intercept.js';
 

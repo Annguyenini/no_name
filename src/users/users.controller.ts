@@ -1,6 +1,6 @@
 import { Body, Controller, Get, ParseUUIDPipe, Patch, Post, Query, Req, UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service.js';
-import { SupabaseGuard } from '../supabase/supabase.guard.js';
+import { SupabaseGuard } from '../supabase-service/supabase.guard.js';
 import { UserDTO } from './dto/user.dto.js';
 import type { AuthenticatedRequest } from '../core/global-types/authenticated-user.js';
 import { AllExceptionsHandler } from '../interceptors/all-exceptions-handler.intercept.js';

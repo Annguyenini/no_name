@@ -6,7 +6,7 @@ import { AuthService } from './auth.service.js';
 import { SignInDTO } from './dto/signin.dto.js';
 import { SignUpDTO } from './dto/signup.dto.js';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { SupabaseGuard } from '../supabase/supabase.guard.js';
+import { SupabaseGuard } from '../supabase-service/supabase.guard.js';
 import { Email } from './dto/verify-email.sto.js';
 import type{ AuthenticatedRequest } from '../core/global-types/authenticated-user.js';
 import { AppException } from '../core/exceptions/app-exceptions.js';
