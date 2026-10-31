@@ -23,5 +23,6 @@ describe('AuthController', () => {
 
     await expect(controller.signInViaToken(request)).resolves.toEqual({ user_id: 'user-123' });
   });
+  it('return')
 });
 // -MIMO: Stub AuthService so the controller unit test does not need auth infrastructure.
