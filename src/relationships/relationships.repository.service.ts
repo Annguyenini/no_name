@@ -1,20 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from "../prisma/prisma.service.js";
 import { PrismaClientKnownRequestError } from '../generated/prisma/internal/prismaNamespace.js';
 import { relationship } from '../generated/prisma/enums.js';
 import { DatabaseException } from '../core/exceptions/app-exceptions.js';
 import { request } from 'express';
-interface OneToOneRelationship {
-  user_id: string
-  target_user_id: string
-  status:relationship
+export interface OneToOneRelationship {
+  user_1: string
+  user_2: string
+  status: relationship
+  last_update?: Date
 }
 
-interface OneToManyRelationship {
+export interface OneToManyRelationship {
   user_1: string
   user_2: string
   user_1_status: relationship
-  user_2_status:relationship
+  user_2_status: relationship
+  last_update?: Date
 }
 
 @Injectable()
@@ -54,48 +56,73 @@ export class RelationshipsRepositoryService {
       }
       throw err;
     }  }
-  _softUserIds(user_1:string, user_2: string) {
-    return  user_1<=user_2 ? [user_1,user_2] : [user_2,user_1]
-  }
-  async getUserFriendList(user_id: string) {
-    const status = relationship.friend;
-
-    return this.getUserRelationships({
-      user_1: user_id,
-      user_2: user_id,
-      user_1_status: relationship.friend,
-      user_2_status: relationship.friend
-    })
-  }
-  async getReceivedFriendRequests(user_id: string) {
-    const user_1_status = relationship.request_from_2;
-    const user_2_status = relationship.request_from_1;
-    return this.getUserRelationships({
-      user_1: user_id,
-      user_2: user_id,
-      user_1_status: user_1_status,
-      user_2_status: user_2_status
-    })
-  }
-  async getSendFriendRequests(user_id: string) {
-    const user_1_status = relationship.request_from_1;
-    const user_2_status = relationship.request_from_2;
-    return this.getUserRelationships({
-      user_1: user_id,
-      user_2: user_id,
-      user_1_status: user_1_status,
-      user_2_status: user_2_status
-    })
-  }
-  async sendFriendRequest(user_id: string,target_user_id:string) {
-    const [user_1,user_2] = this._softUserIds(user_id, target_user_id)
+  async getOneToOneRelationship(relationship: OneToOneRelationship) {
     try {
-      const request = await this.prisma.friendships.upsert({
-
+      const result = await this.prisma.friendships.findFirstOrThrow({
+        where: {
+          AND: [
+            { id1: relationship.user_1 },
+            { id2:relationship.user_2 }
+          ]
+        }
       })
+      return result
     }
     catch (err) {
-
+      if (err instanceof (PrismaClientKnownRequestError) && err.code === "P2025") {
+        throw new BadRequestException('Relationship not exists')
+      }
+      throw err
+    }
+  }
+  async addOrUpdateRelationship(relationship:OneToOneRelationship) {
+    try {
+      const request = await this.prisma.friendships.upsert ({
+        where: {
+          id1_id2: {
+            id1: relationship.user_1,
+            id2: relationship.user_2
+          }
+        },
+        create: {
+          id1: relationship.user_1,
+          id2: relationship.user_2,
+          status: relationship.status
+        },
+        update: {
+          status: relationship.status,
+          last_update: relationship.last_update
+        }
+      })
+      return request
+    }
+    catch (err) {
+      if (err instanceof (PrismaClientKnownRequestError)) {
+        throw new DatabaseException('Relationship',`Failed to add or update relationship: ${err}`,'Failed add or update',500)
+      }
+      throw err
+    }
+  }
+  async deleteRelationship(relationship: OneToOneRelationship) {
+    try {
+      const request = await this.prisma.friendships.delete({
+        where: {
+          id1_id2: {
+            id1: relationship.user_1,
+            id2:relationship.user_2
+          }
+        }
+      })
+      return request
+    }
+    catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === "P2025") {
+          throw new BadRequestException("Relationship not exists")
+        }
+        throw new DatabaseException("Relationship", `Failed to delete user relationship: ${err}`, 'Failed to delete user relationship', 500)
+      }
+      throw err
     }
   }
 }
