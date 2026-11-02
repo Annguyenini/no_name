@@ -87,6 +87,31 @@ describe('Friendships migration', () => {
     expect(got, 'The friendships table is missing its primary key or user foreign keys').toEqual(expect.arrayContaining(expected));
   });
 
+  // -MIMO: Verify the canonical UUID ordering rule exists and has been checked against existing rows.
+  it('has a validated check constraint that orders friendship user IDs', async () => {
+    const got = await prisma.$queryRaw<
+      Array<{ constraint_name: string; definition: string; validated: boolean }>
+    >`
+      SELECT
+        conname AS constraint_name,
+        pg_get_constraintdef(oid) AS definition,
+        convalidated AS validated
+      FROM pg_constraint
+      WHERE conrelid = 'friendships.friendships'::regclass
+        AND contype = 'c'
+    `;
+
+    expect(got, 'The friendship UUID ordering check is missing').toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          constraint_name: 'friendships_id1_less_than_id2',
+          definition: expect.stringMatching(/id1.*<.*id2/),
+          validated: true,
+        }),
+      ]),
+    );
+  });
+
   it('has the status lookup indexes for both users', async () => {
     const got = await prisma.$queryRaw<Array<{ indexname: string }>>`
       SELECT indexname
