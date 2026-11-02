@@ -1,14 +1,30 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service.js';
-import { OneToManyRelationship, OneToOneRelationship, RelationshipsRepositoryService } from '../relationships.repository.service.js';
 import { relationship } from '../../generated/prisma/enums.js';
+import { PrismaClientKnownRequestError } from '../../generated/prisma/internal/prismaNamespace.js';
+import { RelationshipsRepositoryService } from '../relationships.repository.service.js';
 
 describe('RelationshipsRepositoryService', () => {
   let service: RelationshipsRepositoryService;
-  let prisma: { friendships: { findMany: ReturnType<typeof vi.fn>,upsert: ReturnType<typeof vi.fn>,delete: ReturnType<typeof vi.fn> } };
+  let prisma: {
+    friendships: {
+      findMany: ReturnType<typeof vi.fn>;
+      create: ReturnType<typeof vi.fn>;
+      updateMany: ReturnType<typeof vi.fn>;
+      deleteMany: ReturnType<typeof vi.fn>;
+    };
+  };
 
   beforeEach(async () => {
-    prisma = { friendships: { findMany: vi.fn(), upsert: vi.fn(), delete: vi.fn() } };
+    prisma = {
+      friendships: {
+        findMany: vi.fn(),
+        create: vi.fn(),
+        updateMany: vi.fn(),
+        deleteMany: vi.fn(),
+      },
+    };
     const module: TestingModule = await Test.createTestingModule({
       providers: [RelationshipsRepositoryService, { provide: PrismaService, useValue: prisma }],
     }).compile();
@@ -16,46 +32,56 @@ describe('RelationshipsRepositoryService', () => {
     service = module.get<RelationshipsRepositoryService>(RelationshipsRepositoryService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
-  // -MIMO: Verify both friendship directions are filtered so only requests received by the user are returned.
-  it('return all user relationships based in status', async () => {
-    const request_rows = [{ id1: 'sender-1', id2: 'receiver', status: relationship.request_from_1,last_update:new Date() },{ id1: 'sender-1', id2: 'receiver2', status: relationship.request_from_1,last_update:new Date() }];
+  it('queries one user using the status for each canonical pair direction', async () => {
+    const request_rows = [{ id1: 'a', id2: 'b', status: relationship.request_from_1 }];
     prisma.friendships.findMany.mockResolvedValue(request_rows);
-    // -MIMO: Add the required timestamp to the relationship fixture to match the repository contract.
-    const rel: OneToManyRelationship = {
-      user_1: 'receiver',
-      user_2: 'receiver',
-      user_1_status: relationship.request_from_1,
-      user_2_status: relationship.request_from_2,
-      last_update: new Date(),
-    };
-    await expect(service.getUserRelationships(rel)).resolves.toEqual(request_rows);
+
+    await expect(service.getUserRelationships({
+      user_id: 'a',
+      when_user_is_id1: relationship.request_from_1,
+      when_user_is_id2: relationship.request_from_2,
+    })).resolves.toEqual(request_rows);
+
+    expect(prisma.friendships.findMany).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          { AND: [{ id1: 'a' }, { status: relationship.request_from_1 }] },
+          { AND: [{ id2: 'a' }, { status: relationship.request_from_2 }] },
+        ],
+      },
+      orderBy: { last_update: 'desc' },
+    });
   });
 
-  it('return the relationship object after add', async () => {
-    const request = { id1: 'sender-1', id2: 'receiver', status: relationship.request_from_1, last_update: new Date() }
-    prisma.friendships.upsert.mockResolvedValue(request)
-    const rel: OneToOneRelationship = {
-      user_1: 'receiver',
-      user_2: 'sender-1',
-      status: 'request_from_1',
-      last_update:new Date()
-    }
-    await expect(service.addOrUpdateRelationship(rel)).resolves.toEqual(request)
-  })
+  it('maps a Prisma foreign-key error to target user not found', async () => {
+    const prisma_error = Object.assign(new Error('foreign key failed'), { code: 'P2003' });
+    Object.setPrototypeOf(prisma_error, PrismaClientKnownRequestError.prototype);
+    prisma.friendships.create.mockRejectedValue(prisma_error);
 
-  it('return the relationship object after delete', async () => {
-    const request = { id1: 'sender-1', id2: 'receiver', status: relationship.request_from_1, last_update: new Date() }
-    prisma.friendships.delete.mockResolvedValue(request)
-    const rel: OneToOneRelationship = {
-      user_1: 'receiver',
-      user_2: 'sender-1',
-      status: 'request_from_1',
-      last_update:new Date()
-    }
-    await expect(service.deleteRelationship(rel)).resolves.toEqual(request)
-  })
+    await expect(service.addRelationship({
+      user_1: 'a', user_2: 'b', status: relationship.request_from_1,
+    })).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('preserves the client error when no expected status matches during update', async () => {
+    prisma.friendships.updateMany.mockResolvedValue({ count: 0 });
+
+    await expect(service.updateRelationship({
+      user_1: 'a',
+      user_2: 'b',
+      status: relationship.request_from_2,
+      new_status: relationship.friend,
+    })).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('deletes only a row in the expected status and returns the count', async () => {
+    prisma.friendships.deleteMany.mockResolvedValue({ count: 1 });
+
+    await expect(service.deleteRelationship({
+      user_1: 'a', user_2: 'b', status: relationship.friend,
+    })).resolves.toEqual({ count: 1 });
+    expect(prisma.friendships.deleteMany).toHaveBeenCalledWith({
+      where: { id1: 'a', id2: 'b', status: relationship.friend },
+    });
+  });
 });
