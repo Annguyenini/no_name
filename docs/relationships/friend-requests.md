@@ -13,9 +13,9 @@ The relationships controller exposes these authenticated routes:
 
 Routes with `target_user_id` require a UUID path parameter. The Supabase guard verifies the bearer token; the controller always gets the acting user ID from that verified token.
 
-The service delegates relationship reads to the repository, which selects matching rows for either friendship-row direction and sorts by `last_update` newest first.
+The service delegates relationship reads to the repository using one `user_id` and separate status values for when that user is stored as `id1` or `id2`. Results are sorted by `last_update` newest first.
 
-No request body or query parameters are accepted. The response is an array of objects containing `id1`, `id2`, `status`, and `last_update`. An empty array means there are no incoming requests. Missing authentication returns `401`; database failures return a generic `500` response.
+No request body or query parameters are accepted. List responses are arrays of objects containing `id1`, `id2`, `status`, and `last_update`; an empty array means there are no rows for that list. Missing authentication returns `401`; database failures return a generic `500` response.
 
 Example response:
 
@@ -32,8 +32,6 @@ Example response:
 
 ## Sending a friend request (service)
 
-`POST /relationships/friend-requests/:target_user_id` calls `RelationshipsService.sendFriendRequest` with the verified user ID and target ID. The service normalizes the IDs, sets request direction based on the sender, and delegates an upsert to the repository. It supplies `last_update` as a JavaScript `Date` representing the current time; Prisma persists it to the `TIMESTAMPTZ` column.
+`POST /relationships/friend-requests/:target_user_id` calls `RelationshipsService.sendFriendRequest` with the verified user ID and target ID. The service rejects self-targets, normalizes the IDs, sets request direction based on the sender, and delegates a create to the repository. Duplicate pairs return `400`; a target user missing from the database returns `404`. It supplies `last_update` as a JavaScript `Date` representing the current time; Prisma persists it to the `TIMESTAMPTZ` column.
 
-## Follow-up
-
-- Add and verify a `ValidationPipe` for relationship requests when a controller route accepts client input.
+Accepting a request conditionally updates the row only when it still has the expected incoming-request status. If no row matches, the service returns a client error; unexpected database errors remain server errors.
