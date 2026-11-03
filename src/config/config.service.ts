@@ -19,6 +19,7 @@ export class ConfigService {
   getSupabaseConfig(): SupabaseConfigDTO {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+    const secretKey = process.env.SUPABASE_SECRET_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error(
@@ -26,7 +27,7 @@ export class ConfigService {
       );
     }
 
-    return new SupabaseConfigDTO(supabaseUrl, supabaseAnonKey);
+    return new SupabaseConfigDTO(supabaseUrl, supabaseAnonKey,secretKey);
   }
 
   // -MIMO: Read and validate AWS credentials on demand for services that integrate with AWS.

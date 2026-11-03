@@ -27,6 +27,7 @@ export class AllExceptionsHandler implements ExceptionFilter {
         `Error occurred: ${exception.externalMessage}, ${status}`,
       );
       if (exception.internalMessage != null) {
+        console.log(exception.internalMessage)
         this.logger.verbose(
           `Detail of ${exception.name}-${exception.externalMessage}: ${JSON.stringify(
             exception.internalMessage,

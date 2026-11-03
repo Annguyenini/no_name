@@ -15,6 +15,12 @@ export class SupabaseService {
     this.instance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     return this.instance
   }
-
+  getAdminClient() {
+    if (this.instance) return this.instance
+    const { SUPABASE_URL,SUPABASE_SECRET_KEY  } =
+      this.configService.getSupabaseConfig();
+    this.instance = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
+    return this.instance
+  }
 
 }
