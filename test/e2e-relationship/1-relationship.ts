@@ -1,9 +1,9 @@
 import { Test } from "@nestjs/testing";
-import { AppModule } from "../src/app.module.js";
+import { AppModule } from "../../src/app.module.js";
 import request from 'supertest';
 import { INestApplication } from "@nestjs/common";
 import { App } from "supertest/types.js";
-import { relationship } from "../src/generated/prisma/enums.js";
+import { relationship } from "../../src/generated/prisma/enums.js";
 
 
 
@@ -16,11 +16,11 @@ export interface RelationshipTestInput {
   password_2:string
 }
 // maintain 2 active sessions for 2 mock users, using them to test for feature
-export const relationshipTest = (inputs:RelationshipTestInput) => {
-  return describe("Relationship e2e test", () => {
+export const senario1RelationshipTest = (inputs:RelationshipTestInput) => {
+  return describe("Relationship e2e test - senario 1 - user 1 send - user 2 accept", () => {
   const email_1 = inputs.email_1
   const password_1 = inputs.password_1
-  const email_2 = inputs.email_1
+  const email_2 = inputs.email_2
   const password_2 = inputs.password_2
 
   // user_ids will be replace with sorted order
@@ -31,43 +31,41 @@ export const relationshipTest = (inputs:RelationshipTestInput) => {
   let session_2:string
   const sendFriendRequest = async (recipientId: string, session: string) => {
     const response = await request(app.getHttpServer())
-      .post(`/relationship/friend-requests/${recipientId}`)
-      .set('Authorization', session);
+      .post(`/relationships/friend-requests/${recipientId}`)
+      .set('Authorization', `Bearer ${session}`);
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201);
     expect(response.body.status).toBeDefined();
     expect(response.body.last_update).toBeDefined();
     return response;
   };
   const acceptAFriendRequest = async (recipientId: string, session: string) => {
     const response = await request(app.getHttpServer())
-      .post(`friend-requests/received/${recipientId}/accept`)
-      .set('Authorization', session);
-    expect(response.status).toBe(200);
-    expect(response.body.status).toBeDefined();
-    expect(response.body.last_update).toBeDefined();
+      .post(`/relationships/friend-requests/received/${recipientId}/accept`)
+      .set('Authorization', `Bearer ${session}`);
+    expect(response.status).toBe(201);
     return response;
   };
   const getFriendList = (session:string ) => {
     const get = request(app.getHttpServer())
-      .get('/relationship/send-friend-requests')
-      .set('Authorization',session)
+      .get('/relationships/friends')
+      .set('Authorization',`Bearer ${session}`)
     return get
 
   }
   const getSendFriendRequestList = async (session: string) => {
     const get = request(app.getHttpServer())
-      .get('/relationship/send-friend-requests')
-      .set('Authorization',session)
+      .get('/relationships/send-friend-requests')
+      .set('Authorization',`Bearer ${session}`)
     return get
   }
   const getReceivedFriendRequestList = async (session: string) => {
     const get = request(app.getHttpServer())
-      .get('/relationship/received-friend-requests')
-      .set('Authorization',session)
+      .get('/relationships/received-friend-requests')
+      .set('Authorization',`Bearer ${session}`)
     return get
   }
-  const _sorUserIds= (user_id_1: string, user_id_2: string) => {
+    const _sorUserIds = (user_id_1: string, user_id_2: string) => {
     if(user_id_1 === user_id_2 ) throw new Error("can not self select")
     return user_id_1 < user_id_2 ? [user_id_1, user_id_2] : [user_id_2, user_id_1]
   }
@@ -93,6 +91,7 @@ export const relationshipTest = (inputs:RelationshipTestInput) => {
     expect(login_2.body.id).toBeDefined();
 
     [user_id_1, user_id_2] = _sorUserIds(login_1.body.id, login_2.body.id)
+
     if (user_id_1 === login_1.body.id) {
       session_1 = login_1.body.access_token
       session_2 = login_2.body.access_token
@@ -116,7 +115,7 @@ export const relationshipTest = (inputs:RelationshipTestInput) => {
         id1: user_id_1,
         id2: user_id_2,
         status: relationship.request_from_1,
-        last_update:new Date()
+        last_update:expect.any(String)
       }]
       expect(200)
       expect(list.body).toBeDefined()
@@ -131,7 +130,7 @@ export const relationshipTest = (inputs:RelationshipTestInput) => {
         id1: user_id_1,
         id2: user_id_2,
         status: relationship.request_from_1,
-        last_update:new Date()
+        last_update:expect.any(String)
       }]
       expect(200)
       expect(list.body).toBeDefined()
@@ -151,7 +150,7 @@ export const relationshipTest = (inputs:RelationshipTestInput) => {
         id1: user_id_1,
         id2: user_id_2,
         status: relationship.friend,
-        last_update:new Date()
+        last_update:expect.any(String)
       }]
       expect(200)
       expect(list.body).toBeDefined()
@@ -166,32 +165,13 @@ export const relationshipTest = (inputs:RelationshipTestInput) => {
         id1: user_id_1,
         id2: user_id_2,
         status: relationship.friend,
-        last_update:new Date()
+        last_update:expect.any(String)
       }]
       expect(200)
       expect(list.body).toBeDefined()
       expect(list.body).toEqual(expect.arrayContaining(expected_include))
     })
   })
-  // senario 2 - user 1 send request -> user2 => user 2 in user 1 send list => user 1 in user 2 received list.
-  // user 2 reject the request => user 1 removed from user 2 received list, user 2 removed from user 1 send list
-  describe('Senario 2 ', () => {
-    // user 1 send to user 2
-    it('user 1 should able to send request', async () => {
-      const send = await request(app.getHttpServer())
-        .post(`/relationship/friend-requests/${user_id_2}`)
-        .set("Authorization",session_1)
-      expect(200)
-      expect(send.body.status).toBeDefined()
-      expect(send.body.last_update).toBeDefined()
-    })
-    // user 1 check if user 2 in the send requests list
-    // need validate against the expected result
-    it('send requests list of user 1 must have user 2', async () => {
-      const list = await request(app.getHttpServer())
-        .get(`/relationship/send-friend-requests`)
-        .set('Authorization',session_1)
-    })
-  })
+
 })
 }

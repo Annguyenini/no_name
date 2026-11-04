@@ -11,14 +11,14 @@ import { UserRepositoryService } from '../src/users/users.repository.service.js'
 import { SupabaseAdminService } from '../src/supabase-service/supabase.admin.service.js';
 import { userSetup } from './auth.js';
 import { relationship } from '../src/generated/prisma/enums.js';
-import { relationshipTest } from './relationship.js';
+import { senario1RelationshipTest } from './e2e-relationship/1-relationship.js';
 const config = new ConfigService()
 const supabase = new SupabaseService(config)
 const supabase_admin_service = new SupabaseAdminService(supabase)
 
 describe('AppController (e2e)', () => {
   const email_1 = "testtses111@gmail.com";
-  const email_2 = "testts111@gmail.com";
+  const email_2 = "testts2211@gmail.com";
   const password_1 = "Oigioioi1123@";
   const password_2 = "Oigioioi1123@";
 
@@ -34,12 +34,12 @@ describe('AppController (e2e)', () => {
     }
   }, 15000);
     userSetup(email_1, password_1)
-  //   userSetup(email_2,password_2)
+    userSetup(email_2,password_2)
 
-  //   relationshipTest({
-  //     email_1,
-  //     email_2,
-  //     password_1,
-  //     password_2
-  // })
+    senario1RelationshipTest({
+      email_1,
+      email_2,
+      password_1,
+      password_2
+  })
 })
