@@ -171,6 +171,28 @@ export const senario1RelationshipTest = (inputs:RelationshipTestInput) => {
       expect(list.body).toBeDefined()
       expect(list.body).toEqual(expect.arrayContaining(expected_include))
     })
+
+    // -MIMO: Keep the unfriend mutation isolated so failures identify the request that changed the relationship.
+    it('user 1 should be able to unfriend user 2', async () => {
+      await request(app.getHttpServer())
+        .delete(`/relationships/friends/${user_id_2}`)
+        .set('Authorization', `Bearer ${session_1}`)
+        .expect(200, { count: 1 });
+    });
+
+    it('user 2 should no longer appear in user 1 friend list', async () => {
+      const user_1_friends = await getFriendList(session_1).expect(200);
+      expect(user_1_friends.body).not.toEqual(
+        expect.arrayContaining([expect.objectContaining({ id1: user_id_1, id2: user_id_2 })]),
+      );
+    });
+
+    it('user 1 should no longer appear in user 2 friend list', async () => {
+      const user_2_friends = await getFriendList(session_2).expect(200);
+      expect(user_2_friends.body).not.toEqual(
+        expect.arrayContaining([expect.objectContaining({ id1: user_id_1, id2: user_id_2 })]),
+      );
+    });
   })
 
 })

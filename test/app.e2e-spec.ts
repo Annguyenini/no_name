@@ -12,6 +12,8 @@ import { SupabaseAdminService } from '../src/supabase-service/supabase.admin.ser
 import { userSetup } from './auth.js';
 import { relationship } from '../src/generated/prisma/enums.js';
 import { senario1RelationshipTest } from './e2e-relationship/1-relationship.js';
+import { senario2RelationshipTest } from './e2e-relationship/2-relationship.js';
+import { senario3RelationshipTest } from './e2e-relationship/3-relationship.js';
 const config = new ConfigService()
 const supabase = new SupabaseService(config)
 const supabase_admin_service = new SupabaseAdminService(supabase)
@@ -36,6 +38,20 @@ describe('AppController (e2e)', () => {
     userSetup(email_1, password_1)
     userSetup(email_2,password_2)
 
+    // -MIMO: Register the user 1 sends/user 2 rejects flow with the existing provisioned test accounts.
+    senario2RelationshipTest({
+      email_1,
+      email_2,
+      password_1,
+      password_2
+  })
+    // -MIMO: Register the sender cancellation flow after rejection and before acceptance reuses the test pair.
+    senario3RelationshipTest({
+      email_1,
+      email_2,
+      password_1,
+      password_2
+  })
     senario1RelationshipTest({
       email_1,
       email_2,

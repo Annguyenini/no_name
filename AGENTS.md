@@ -13,6 +13,7 @@ After you change/ create/ delete any features in code base:
      -MIMO: For every documented feature or endpoint, include two scenario diagrams: one black-box diagram showing the system boundary, inputs, and outputs, and one detailed diagram showing the relevant internal flow and branches.
      -MIMO: Keep each module's documentation in two files: `<module>-diagrams.md` for both diagrams, and `<module>-api.md` for expected inputs, outputs, HTTP status codes, and a plain-language explanation of what each status usually means.
   2 add test, dont worry about e2e, just unit test.
+     -MIMO: Keep each test case to one HTTP request so failures are easy to isolate; put mutation requests and follow-up list/read requests in separate test cases.
   
 
 Refrences: for files/folders use kebab-case convention: test-feature
