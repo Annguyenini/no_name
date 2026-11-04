@@ -56,7 +56,7 @@ export const senario2RelationshipTest = (inputs: RelationshipTestInput) => {
         status: relationship.request_from_1,
         last_update:expect.any(String)
         }]
-      expect(response.body).toEqual(expect.arrayContaining(expected))
+      expect(response.body).toEqual(expect.objectContaining(expected[0]));
     });
 
     // -MIMO: Verify the sender can read the new request from the outgoing request list.

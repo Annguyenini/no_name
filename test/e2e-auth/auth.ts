@@ -4,11 +4,11 @@ import { fileURLToPath } from 'node:url';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from '../src/app.module.js';
-import { SupabaseService } from '../src/supabase-service/supabase.service.js';
-import { ConfigService } from '../src/config/config.service.js';
-import { UserRepositoryService } from '../src/users/users.repository.service.js';
-import { SupabaseAdminService } from '../src/supabase-service/supabase.admin.service.js';
+import { AppModule } from '../../src/app.module.js';
+import { SupabaseService } from '../../src/supabase-service/supabase.service.js';
+import { ConfigService } from '../../src/config/config.service.js';
+import { UserRepositoryService } from '../../src/users/users.repository.service.js';
+import { SupabaseAdminService } from '../../src/supabase-service/supabase.admin.service.js';
 const config = new ConfigService()
 const supabase = new SupabaseService(config)
 const supabase_admin_service = new SupabaseAdminService(supabase)

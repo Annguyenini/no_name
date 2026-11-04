@@ -9,7 +9,7 @@ import { SupabaseService } from '../src/supabase-service/supabase.service.js';
 import { ConfigService } from '../src/config/config.service.js';
 import { UserRepositoryService } from '../src/users/users.repository.service.js';
 import { SupabaseAdminService } from '../src/supabase-service/supabase.admin.service.js';
-import { userSetup } from './auth.js';
+import { userSetup } from './e2e-auth/auth.js';
 import { relationship } from '../src/generated/prisma/enums.js';
 import { senario1RelationshipTest } from './e2e-relationship/1-relationship.js';
 import { senario2RelationshipTest } from './e2e-relationship/2-relationship.js';
