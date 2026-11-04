@@ -10,4 +10,4 @@ Avatar upload verification now uses the shared contents repository. When returni
 - If actual file format or image dimensions must be trusted, read and decode the uploaded file with an image parser; S3 metadata alone cannot verify them.
 - Unit tests cover successful verification and rejected oversized, disallowed, or unowned uploads; keep them and the avatar flow docs current.
 
-See [user module notes](../users/user-module-notes.md#upload-size-and-object-verification) for the detailed size and verification guidance.
+See [Users API contract](../users/users-api.md) for the current avatar request and verification behavior.
