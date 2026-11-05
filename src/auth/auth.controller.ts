@@ -51,6 +51,7 @@ export class AuthController {
   async refreshToken(@Headers('authorization') authorization: string | undefined) {
     const match = authorization?.match(/^Bearer\s+(.+)$/i);
     const refresh_token = match?.[1]?.trim();
+    console.log(refresh_token)
     if (!refresh_token) throw new UnauthorizedException('Missing or invalid refresh token');
 
     return this.auth_service.requestNewAccessToken(refresh_token);

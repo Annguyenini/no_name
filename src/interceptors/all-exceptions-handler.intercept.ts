@@ -23,6 +23,7 @@ export class AllExceptionsHandler implements ExceptionFilter {
     this.logRequest(request, status);
 
     if (exception instanceof AppException) {
+      console.error(exception)
       this.logger.error(
         `Error occurred: ${exception.externalMessage}, ${status}`,
       );

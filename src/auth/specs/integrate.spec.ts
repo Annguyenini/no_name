@@ -1,11 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ExecutionContext, INestApplication } from '@nestjs/common';
+import { ExecutionContext, INestApplication, UnauthorizedException } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { AppModule } from '../../app.module.js';
 import { SupabaseService } from '../../supabase-service/supabase.service.js';
-import { SupabaseClient } from '@supabase/supabase-js';
-import { SupabaseGuard } from '../../supabase-service/supabase.guard.js';
 
 describe('AppController (e2e)', () => {
   const legitEmail = "testtses111@gmail.com";
@@ -15,14 +13,19 @@ describe('AppController (e2e)', () => {
   let supabase_client: {
     auth: {
       signInWithPassword: ReturnType<typeof vi.fn>
-      signUp:ReturnType<typeof vi.fn>
+      signUp: ReturnType<typeof vi.fn>
+      getUser: ReturnType<typeof vi.fn>
+      refreshSession:ReturnType<typeof vi.fn>
     }
   }
+
   beforeAll(async () => {
     supabase_client = {
       auth: {
         signInWithPassword: vi.fn(),
-        signUp: vi.fn()
+        signUp: vi.fn(),
+        getUser: vi.fn(),
+        refreshSession:vi.fn()
       },
     };
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -32,14 +35,6 @@ describe('AppController (e2e)', () => {
       .useValue({
         getClient: () => supabase_client,
         getAdminClient: () => supabase_client})
-    .overrideGuard(SupabaseGuard)
-      .useValue({
-        canActivate: (context: ExecutionContext)=>{
-          const request = context.switchToHttp().getRequest()
-          request.user = { id: "user-1" }
-          return true
-        }
-      })
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -154,11 +149,22 @@ describe('AppController (e2e)', () => {
         .expect(401);
     });
     it('should return 200', async () => {
-
+      supabase_client.auth.getUser.mockResolvedValue({
+        data: {
+          user: {
+            id: 'user-1',
+            email:'person@gmail.com'
+          }
+        },
+        error:null
+      })
       await request(app.getHttpServer())
         .get('/auth/sign-in-via-token')
-        .set('Authorization', 'test')
-        .expect(400)
+        .set('Authorization', 'Bearer test')
+        .expect(200)
+        .expect({
+          user_id:'user-1'
+        })
     })
   })
 
@@ -177,5 +183,25 @@ describe('AppController (e2e)', () => {
 
         .expect(401);
       });
+  })
+  it('should accept and return new access token and refresh token', async () => {
+    supabase_client.auth.refreshSession.mockResolvedValue({
+      data: {
+        user: {
+          id:'user-1'
+        },
+        session: {
+          access_token: 'new access token',
+          refresh_token: 'new refresh token'
+        }
+      },
+      error:null
     })
+    await request(app.getHttpServer())
+      .get('/auth/refresh-token')
+      .set("Authorization", 'Bearer testdsdsdsdsdsdsdsdsdsdsd2222')
+      .set("authorization",'Bearer testdsdsdsdsdsdsdsdsdsdsd2222')
+      .expect(200)
+      .expect({id:'user-1',access_token:"new access token",refresh_token:"new refresh token"})
+  })
 });

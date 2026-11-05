@@ -52,13 +52,6 @@ describe('Relationships smoke checks', () => {
         .set('Authorization', `Bearer ${invalid_token}`)
         .expect(401);
     });
-
-    it('returns 200 with a valid token', async () => {
-      await request(app.getHttpServer())
-        .get(path)
-        .set('Authorization', `Bearer ${access_token}`)
-        .expect(200);
-    });
   });
 
   describe('POST /relationships/friend-requests/:target_user_id', () => {

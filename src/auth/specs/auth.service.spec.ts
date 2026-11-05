@@ -56,6 +56,7 @@ describe('AuthService', () => {
     });
 
     await expect(service.requestNewAccessToken('refresh-1')).resolves.toEqual({
+      id:'user-1',
       access_token: 'access-2',
       refresh_token: 'refresh-2',
     });

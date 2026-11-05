@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { SignUpDTO } from "./dto/signup.dto.js";
 import { BadRequestException, InternalServerErrorException, UnauthorizedException,Injectable, Inject } from "@nestjs/common";
+
 import { SignInDTO } from "./dto/signin.dto.js";
 import { SupabaseService } from "../supabase-service/supabase.service.js";
 import { AppException, RepositoryExceptions, SupabaseException, SystemException } from "../core/exceptions/app-exceptions.js";
@@ -11,7 +12,8 @@ import { Email } from "./dto/verify-email.sto.js";
 export class AuthRepositoryService{
   private supabase: SupabaseClient
   constructor(
-    private readonly supabaseService: SupabaseService) {
+    private readonly supabaseService: SupabaseService,
+    ) {
     this.supabase = this.supabaseService.getClient()
     }
 
@@ -24,7 +26,8 @@ export class AuthRepositoryService{
       })
 
       if (user.error || !user.data.user) {
-        throw new BadRequestException("Email not good")
+        console.error(user.error)
+        throw new BadRequestException("Email already associate with an account")
       }
       return user
       }
@@ -64,6 +67,8 @@ export class AuthRepositoryService{
           500,
         )
       }
+
+
       return
     } catch (err: unknown) {
       if (err instanceof AppException) {
