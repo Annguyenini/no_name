@@ -1,13 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { SignUpDTO } from "./dto/signup.dto.js";
-import { ResposeDTO } from "./dto/respone.dto.js";
-import { UserRepositoryService } from "../users/users.repository.service.js";
 import { BadRequestException, InternalServerErrorException, UnauthorizedException,Injectable, Inject } from "@nestjs/common";
-import { CompleteSignUpDTO } from "./dto/complete-signup.dto.js";
-import { UserDTO } from "../users/dto/user.dto.js";
 import { SignInDTO } from "./dto/signin.dto.js";
 import { SupabaseService } from "../supabase-service/supabase.service.js";
-import { response } from "express";
 import { AppException, RepositoryExceptions, SupabaseException, SystemException } from "../core/exceptions/app-exceptions.js";
 import { Email } from "./dto/verify-email.sto.js";
 
@@ -16,8 +11,7 @@ import { Email } from "./dto/verify-email.sto.js";
 export class AuthRepositoryService{
   private supabase: SupabaseClient
   constructor(
-    private readonly supabaseService: SupabaseService,
-    private readonly user_repository: UserRepositoryService) {
+    private readonly supabaseService: SupabaseService) {
     this.supabase = this.supabaseService.getClient()
     }
 
@@ -30,8 +24,7 @@ export class AuthRepositoryService{
       })
 
       if (user.error || !user.data.user) {
-        console.error(user.error)
-        throw new BadRequestException("Email already associate with an account")
+        throw new BadRequestException("Email not good")
       }
       return user
       }
@@ -40,41 +33,7 @@ export class AuthRepositoryService{
     throw err
     }
   }
-  // async emailVerification(email: string, token: string) {
-  //   try {
-  //     const verify = await this.supabase.auth.verifyOtp({
-  //       email,
-  //       token,
-  //       type: 'email'
-  //     })
-  //     if (verify.error || !verify.data) {
-  //       throw new Error(`Failed to verify token`)
-  //     }
-  //     return verify
-  //   }
-  //   catch (err) {
-  //     throw new InternalServerErrorException(`Failed to verify email: ${err}`)
-  //   }
-  // }
-  // async completeSignUp(user:UserDTO) {
 
-  //   try {
-  //     // check if username exists
-
-  //     if (await this.user_repository.getUserByUsername(user.username)) {
-  //       throw new BadRequestException("Username already exists")
-  //     }
-
-  //     const insert = await this.user_repository.insertNewUser(user)
-  //     if (!insert) {
-  //       throw new Error("Unexpected error occur when try to insert new user")
-  //     }
-  //     return insert
-  //   }
-  //   catch (err) {
-  //     throw new InternalServerErrorException(`Failed to completeSignUp: ${err}`)
-  //   }
-  // }
   async signIn(user: SignInDTO) {
     const signin = await this.supabase.auth.signInWithPassword(
       {
@@ -91,7 +50,7 @@ export class AuthRepositoryService{
     credential: Email,
   ) {
     try {
-      const { data, error } =
+      const { error } =
         await this.supabase.auth.resend({
           type: 'signup',
           email: credential.email,
@@ -105,17 +64,7 @@ export class AuthRepositoryService{
           500,
         )
       }
-
-      if (!data) {
-        throw new SupabaseException(
-          "supabase",
-          'Supabase returned no data',
-          'Failed to resend email confirmation',
-          500,
-        )
-      }
-
-      return data
+      return
     } catch (err: unknown) {
       if (err instanceof AppException) {
         throw err
