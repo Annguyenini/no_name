@@ -2,8 +2,6 @@ import { BadRequestException, ConflictException, HttpException, Injectable, NotF
 import { UserDTO } from './dto/user.dto.js';
 import { UserRepositoryService } from './users.repository.service.js';
 import { AWSExceptions, RepositoryExceptions } from '../core/exceptions/app-exceptions.js';
-import { ContentsService } from '../contents/contents.service.js';
-import { ContentsRepositoryService } from '../contents/contents.repository.service.js';
 
 @Injectable()
 export class UsersService {

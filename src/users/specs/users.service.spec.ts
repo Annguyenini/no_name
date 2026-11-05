@@ -1,8 +1,8 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ContentsRepositoryService } from '../contents/contents.repository.service.js';
-import { UserRepositoryService } from './users.repository.service.js';
-import { UsersService } from './users.service.js';
+import { ContentsRepositoryService } from '../../contents/contents.repository.service.js';
+import { UserRepositoryService } from '../users.repository.service.js';
+import { UsersService } from '../users.service.js';
 
 // -MIMO: Verify user profile and avatar service behavior using mocked repositories only.
 describe('UsersService', () => {

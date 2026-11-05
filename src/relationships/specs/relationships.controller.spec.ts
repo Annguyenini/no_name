@@ -1,6 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { RelationshipsController } from './relationships.controller.js';
-import { RelationshipsService } from './relationships.service.js';
+import { RelationshipsController } from '../relationships.controller.js';
+import { RelationshipsService } from '../relationships.service.js';
 import type { AuthenticatedRequest } from '../../core/global-types/authenticated-user.js';
 
 describe('RelationshipsController', () => {

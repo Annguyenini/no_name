@@ -7,7 +7,7 @@ import { AppModule } from '../../src/app.module.js';
 // -MIMO: Smoke-check authentication, path validation, and expected results for every relationship endpoint.
 describe('Relationships smoke checks', () => {
   const legit_email = 'testtses111@gmail.com';
-  const legit_password = 'KKIIk1123@';
+  const legit_password = 'Oigioioi1123@';
   const invalid_token = 'invalid-token';
   const malformed_user_id = 'not-a-uuid';
   const missing_user_id = '00000000-0000-4000-8000-000000000001';

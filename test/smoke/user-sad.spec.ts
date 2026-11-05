@@ -6,7 +6,7 @@ import { AppModule } from '../../src/app.module.js';
 
 describe('User sad cases', () => {
   const legitEmail = 'testtses111@gmail.com';
-  const legitPassword = 'KKIIk1123@';
+  const legitPassword = 'Oigioioi1123@';
   const missing_profile_id = '00000000-0000-4000-8000-000000000001';
   let app: INestApplication<App>;
   let token: string;

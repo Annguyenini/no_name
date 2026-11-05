@@ -107,7 +107,7 @@ export const userSetup = (email:string,password:string) => {
        expect(urlResponse.body.url).toBeDefined();
        // 2. Read the test image
        const imageBuffer = fs.readFileSync(
-         fileURLToPath(new URL('./images/stock-image.jpeg', import.meta.url)),
+         fileURLToPath(new URL('../images/stock-image.jpeg', import.meta.url)),
        );
 
        expect(imageBuffer.length).toBeGreaterThan(0);
@@ -143,6 +143,22 @@ export const userSetup = (email:string,password:string) => {
        expect(user_data.body.status).toBe('active');
      })
    })
+
+   describe('PATCH /users/update-display-name', () => {
+     it('should update the authenticated user display name', async () => {
+       // -MIMO: Verify the authenticated profile display-name update with one isolated API request.
+       const updated_display_name = `E2E Name ${Date.now().toString(36)}`;
+       const response = await request(app.getHttpServer())
+         .patch('/users/update-display-name')
+         .set('Authorization', `Bearer ${access_token}`)
+         .send({ display_name: updated_display_name })
+         .expect(200);
+
+       expect(response.body.id).toBeDefined();
+       expect(response.body.display_name).toBe(updated_display_name);
+       display_name = updated_display_name;
+     });
+   });
 
  })
 

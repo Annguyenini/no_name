@@ -19,10 +19,12 @@ describe('ConfigService', () => {
   it('returns AWS credentials from the environment', () => {
     vi.stubEnv('AWS_ACCESS_KEY', 'test-access-key');
     vi.stubEnv('AWS_SECRET_ACCESS_KEY', 'test-secret-key');
+    vi.stubEnv('AWS_REGION', 'test-region');
 
     expect(service.getAwsConfig()).toEqual({
       AWS_ACCESS_KEY: 'test-access-key',
       AWS_SECRET_ACCESS_KEY: 'test-secret-key',
+      AWS_REGION:'test-region'
     });
 
     vi.unstubAllEnvs();
@@ -31,9 +33,10 @@ describe('ConfigService', () => {
   it('requires both AWS credentials when AWS config is requested', () => {
     vi.stubEnv('AWS_ACCESS_KEY', '');
     vi.stubEnv('AWS_SECRET_ACCESS_KEY', '');
+    vi.stubEnv('AWS_REGION', '');
 
     expect(() => service.getAwsConfig()).toThrow(
-      'AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY must be set in the environment',
+      'AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY and AWS_REGION must be set in the environment',
     );
 
     vi.unstubAllEnvs();
