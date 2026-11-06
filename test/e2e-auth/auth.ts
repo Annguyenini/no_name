@@ -44,7 +44,6 @@ export const userSetup = (email:string,password:string) => {
            email: email,
            password: password,
          });
-
        if (res.status !== 201) {
          if(res.status!==401) return
          throw new Error("Failed to signup")
