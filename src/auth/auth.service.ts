@@ -29,6 +29,7 @@ export class AuthService {
     }
 
     const response = new SignInResponseDTO();
+    response.id=user.id
     response.access_token = session.access_token;
     response.refresh_token = session.refresh_token;
     return response;
@@ -47,8 +48,7 @@ export class AuthService {
     return response
   }
   async resendEmailConfirmation(user: Email) {
-    const resend = await this.auth_repository.resendSignupEmailConfirmation(user)
-    return
+    return this.auth_repository.resendSignupEmailConfirmation(user)
   }
   // async completeSignUp(user: UserDTO) {
   //   try {

@@ -1,7 +1,7 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthRepositoryService } from './auth-repository.service.js';
-import { AuthService } from './auth.service.js';
+import { AuthRepositoryService } from '../auth-repository.service.js';
+import { AuthService } from '../auth.service.js';
 
 // -MIMO: Verify auth token handling and invalid-credential failures with a mocked repository.
 describe('AuthService', () => {
@@ -56,6 +56,7 @@ describe('AuthService', () => {
     });
 
     await expect(service.requestNewAccessToken('refresh-1')).resolves.toEqual({
+      id:'user-1',
       access_token: 'access-2',
       refresh_token: 'refresh-2',
     });

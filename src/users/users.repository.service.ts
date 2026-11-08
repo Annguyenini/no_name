@@ -72,7 +72,8 @@ export class UserRepositoryService{
     }
   }
   async insertNewUser(user: UserDTO): Promise<UserDTO> {
-    try{
+    try {
+      console.log(user)
     const success = await this.prisma.users.create({
       data: {
         id: user.id,

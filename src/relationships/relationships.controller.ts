@@ -29,7 +29,7 @@ export class RelationshipsController {
   @Get('friends')
   async getFriendList(@Req() request: AuthenticatedRequest) {
     if (!request.user?.id) throw new UnauthorizedException();
-    return await this.relationships_service.getUserFriendList(request.user.id);
+    return this.relationships_service.getUserFriendList(request.user.id);
   }
   @UseGuards(SupabaseGuard)
   @Get('send-friend-requests')
