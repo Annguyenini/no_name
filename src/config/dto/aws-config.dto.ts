@@ -4,6 +4,6 @@ export class AWSConfigDTO {
     public readonly AWS_ACCESS_KEY: string,
     public readonly AWS_SECRET_ACCESS_KEY: string,
     public readonly AWS_REGION: string,
-
+    public readonly AWS_BUCKET:string
   ) {}
 }
