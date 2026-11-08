@@ -13,18 +13,6 @@ export class S3Service {
   constructor(private readonly s3_instance_service:S3InstanceService) {
     this.s3_instance = s3_instance_service.getClient()
   }
-  async s3_upload(file: string, bucket: string, name: string, mimetype: string) {
-    const params = new PutObjectCommand({
-      Bucket: bucket,
-      Key: String(name),
-      Body: file,
-      ContentType: mimetype,
-      ContentDisposition: 'inline',
-    });
-      let s3Response = await this.s3_instance.send(params)
-      return s3Response;
-  }
-
   async generateUploadUrl(object: ContentObject) {
     const object_pro = object.getUploadObject()
     const command = new PutObjectCommand({

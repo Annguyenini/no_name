@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common"
-
+// Make sure the content request initialize before generate url
 export interface UploadRequest{
   user_id: string,
   key: string,
