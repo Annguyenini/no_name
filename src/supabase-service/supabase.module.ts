@@ -7,6 +7,6 @@ import { SupabaseAdminService } from './supabase.admin.service.js';
 @Module({
   imports: [ConfigModule],
   providers: [SupabaseService, JwtSupabaseStrategy,SupabaseAdminService],
-  exports: [SupabaseService, JwtSupabaseStrategy,SupabaseAdminService],
+  exports: [SupabaseService, SupabaseAdminService,JwtSupabaseStrategy],
 })
 export class SupabaseModule {}
