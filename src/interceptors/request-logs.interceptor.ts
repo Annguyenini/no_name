@@ -15,6 +15,27 @@ export class LoggingInterceptor implements NestInterceptor {
   // -MIMO: Log the endpoint, client IP, and duration after every HTTP request completes.
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const started_at = Date.now();
+    const type = context.getType()
+    if (type === "ws") {
+      const client = context.switchToWs().getClient();
+      const ip =
+        client.handshake?.address ??
+        client.conn?.remoteAddress ??
+        'unknown';
+
+            console.log('[WEBSOCKET]', {
+              socketId: client.id,
+              ip,
+            });
+      return next.handle().pipe(
+        finalize(() => {
+          const duration_ms = Date.now() - started_at;
+          this.logger.log(
+            `Request ip=${ip} ${duration_ms}ms`,
+          );
+        }),
+      );
+    }
     const request = context.switchToHttp().getRequest<Request>();
     const request_ip = request.ip || request.socket.remoteAddress || 'unknown';
     const request_endpoint = request.path || request.url;

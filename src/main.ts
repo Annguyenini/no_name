@@ -5,7 +5,7 @@ import { LoggingInterceptor } from './interceptors/request-logs.interceptor.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    instrument: ObserveInstrument,
+      instrument: ObserveInstrument,
   });
   // -MIMO: Apply request logging to all HTTP routes.
   app.useGlobalInterceptors(new LoggingInterceptor());

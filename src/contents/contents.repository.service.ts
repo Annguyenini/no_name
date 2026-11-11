@@ -2,10 +2,15 @@ import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/co
 import { S3Service } from '../aws/s3/s3.service.js';
 import { ContentObject } from '../aws/s3/s3.object.js';
 import { UploadRequests } from './contents-requests.service.js';
+import { Config } from 'aws-sdk';
+import { ConfigService } from '../config/config.service.js';
 
 @Injectable()
 export class ContentsRepositoryService {
-  constructor(private readonly s3_service : S3Service,private readonly upload_requests_list : UploadRequests ){}
+  constructor(private readonly s3_service: S3Service, private readonly upload_requests_list: UploadRequests) {
+    const config = new ConfigService()
+    s3_service = new S3Service(config)
+  }
 
   // -MIMO: Generate and track a time-limited upload request for reusable content workflows.
   async requestUploadUrl(user_id: string, object: ContentObject) {
