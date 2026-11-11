@@ -4,14 +4,18 @@ import * as AWS from 'aws-sdk';
 import { S3Client, PutObjectCommand, HeadObjectCommand, GetObjectCommand} from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { ContentObject } from "./s3.object.js";
+import { ConfigService } from "../../config/config.service.js";
 
 
 
 @Injectable()
 export class S3Service {
   private s3_instance
-  constructor(private readonly s3_instance_service:S3InstanceService) {
-    this.s3_instance = s3_instance_service.getClient()
+  private s3_instance_service
+  constructor( readonly config:ConfigService) {
+    this.s3_instance_service = new S3InstanceService(config)
+
+    this.s3_instance = this.s3_instance_service.getClient()
   }
   async generateUploadUrl(object: ContentObject) {
     const object_pro = object.getUploadObject()

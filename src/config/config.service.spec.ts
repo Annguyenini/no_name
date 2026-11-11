@@ -20,11 +20,13 @@ describe('ConfigService', () => {
     vi.stubEnv('AWS_ACCESS_KEY', 'test-access-key');
     vi.stubEnv('AWS_SECRET_ACCESS_KEY', 'test-secret-key');
     vi.stubEnv('AWS_REGION', 'test-region');
+    vi.stubEnv('AWS_BUCKET', 'test-bucket');
 
     expect(service.getAwsConfig()).toEqual({
       AWS_ACCESS_KEY: 'test-access-key',
       AWS_SECRET_ACCESS_KEY: 'test-secret-key',
-      AWS_REGION:'test-region'
+      AWS_REGION:'test-region',
+      AWS_BUCKET:'test-bucket'
     });
 
     vi.unstubAllEnvs();
@@ -34,9 +36,10 @@ describe('ConfigService', () => {
     vi.stubEnv('AWS_ACCESS_KEY', '');
     vi.stubEnv('AWS_SECRET_ACCESS_KEY', '');
     vi.stubEnv('AWS_REGION', '');
+    vi.stubEnv('AWS_BUCKET', '');
 
     expect(() => service.getAwsConfig()).toThrow(
-      'AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY and AWS_REGION must be set in the environment',
+      'AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY and AWS_REGION and AWS_BUCKET must be set in the environment',
     );
 
     vi.unstubAllEnvs();

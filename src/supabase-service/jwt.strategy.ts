@@ -25,6 +25,9 @@ export class JwtSupabaseStrategy extends PassportStrategy(Strategy,'jwt') {
       throw new UnauthorizedException("Missing Token")
     }
     const token = authorization.slice(7)
+    return await this.supabaseValidation(token)
+  }
+  async supabaseValidation(token: string) {
     const user = await this.supabase.auth.getUser(token)
 
     if (user.error || !user.data) {

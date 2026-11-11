@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common"
 import type { S3Object } from "./dto/object.js"
+import { ConfigService } from "../../config/config.service.js"
 
 
 
@@ -14,8 +15,9 @@ export class AvatarUploadObject implements ContentObject {
   private max_object_size: number
   private expires_in:number
   constructor(user_id: string) {
-    if(!user_id ) throw new BadRequestException("user_id require")
-    this.bucket = `no-name-v1`
+    if (!user_id) throw new BadRequestException("user_id require")
+    const  config_instance = new ConfigService()
+    this.bucket = config_instance.getAwsConfig().AWS_BUCKET
     this.key = `avatar/${user_id}.jpg`
     this.content_type = "image/jpeg"
     this.max_object_size = 5 * 1024 * 1024
