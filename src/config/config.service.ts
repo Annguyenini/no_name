@@ -21,7 +21,7 @@ export class ConfigService {
     const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
     const secretKey = process.env.SUPABASE_SECRET_KEY;
 
-    if (!supabaseUrl || !supabaseAnonKey ||!secretKey) {
+    if (!supabaseUrl || !supabaseAnonKey||!secretKey) {
       throw new Error(
         'SUPABASE_URL and SUPABASE_ANON_KEY must be set in the environment',
       );
