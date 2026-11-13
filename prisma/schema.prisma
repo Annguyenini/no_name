@@ -616,7 +616,7 @@ model users {
 }
 model trip{
   id String @id @db.Uuid
-  image_cover_key String
+  image_cover_key String?
   created_time DateTime @default(now()) @db.Timestamptz(6)
   ended_time DateTime @default(now()) @db.Timestamptz(6)
   trip_name String

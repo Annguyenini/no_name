@@ -13,6 +13,7 @@ import { S3Module } from './aws/s3/s3.module.js';
 import { ContentsModule } from './contents/contents.module.js';
 import { RelationshipsModule } from './relationships/relationships.module.js';
 import { PcpModule } from './pcp/pcp.module.js';
+import { TripModule } from './trip/trip.module.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 // -MIMO: Import the admin feature so its protected user-management routes are registered.
@@ -40,6 +41,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     RelationshipsModule,
 
     PcpModule,
+
+    TripModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService],
