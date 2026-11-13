@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  schemas  = ["auth", "friendships", "permission", "public", "users"]
+  schemas  = ["auth", "friendships", "permission", "public", "users","trip"]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -609,11 +609,36 @@ model users {
   friendships_friendships_id1Tousers friendships[] @relation("friendships_id1Tousers")
   friendships_friendships_id2Tousers friendships[] @relation("friendships_id2Tousers")
   permission                         permission?
+  trip_trip_permission_user_id trip_permission []
   users                              auth_users    @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("users")
 }
+model trip{
+  id String @id @db.Uuid
+  image_cover_key String
+  created_time DateTime @default(now()) @db.Timestamptz(6)
+  ended_time DateTime @default(now()) @db.Timestamptz(6)
+  trip_name String
+  privacy trip_privacy? @default(private)
 
+  permission trip_permission[]
+  @@schema("trip")
+}
+model trip_permission{
+  id String @id @db.Uuid
+  trip_id String @db.Uuid
+  user_id String @db.Uuid
+  role trip_role? @default(viewer)
+  user        users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  trip        trip        @relation(fields: [trip_id], references: [id], onDelete: Cascade)
+  @@unique([user_id,trip_id]) // user should only exists 1 per trip
+  @@index([user_id,role]) // for find user with specific role
+  @@index([trip_id]) // for all user in the trip
+  @@index([trip_id,role]) // find specific role of trip
+  @@index([user_id]) // find all trip that user in
+  @@schema("trip")
+  }
 enum aal_level {
   aal1
   aal2
@@ -708,4 +733,20 @@ enum status {
   deactivate
 
   @@schema("users")
+}
+
+
+enum trip_role{
+  owner
+  admin
+  editor
+  viewer
+  @@schema("trip")
+}
+
+enum trip_privacy{
+  private
+  shared
+  public
+  @@schema("trip")
 }
