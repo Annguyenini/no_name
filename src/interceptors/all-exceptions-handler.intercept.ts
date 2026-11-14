@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { AppException } from '../core/exceptions/app-exceptions.js';
+import { AppException, PermissionException } from '../core/exceptions/app-exceptions.js';
 
 @Catch()
 export class AllExceptionsHandler implements ExceptionFilter {
@@ -23,12 +23,10 @@ export class AllExceptionsHandler implements ExceptionFilter {
     this.logRequest(request, status);
 
     if (exception instanceof AppException) {
-      console.error(exception)
       this.logger.error(
         `Error occurred: ${exception.externalMessage}, ${status}`,
       );
       if (exception.internalMessage != null) {
-        console.log(exception.internalMessage)
         this.logger.verbose(
           `Detail of ${exception.name}-${exception.externalMessage}: ${JSON.stringify(
             exception.internalMessage,
@@ -38,6 +36,21 @@ export class AllExceptionsHandler implements ExceptionFilter {
         );
       }
 
+      response.status(status).json({
+        statusCode: status,
+        message: exception.externalMessage,
+        timeStamp: new Date().toString(),
+      });
+      return;
+    }
+    else if (exception instanceof PermissionException) {``
+      this.logger.verbose(
+        `Detail of ${exception.name}-${exception.externalMessage}: ${JSON.stringify(
+          exception.internalMessage,
+          null,
+          2,
+        )}`,
+      );
       response.status(status).json({
         statusCode: status,
         message: exception.externalMessage,

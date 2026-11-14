@@ -17,10 +17,19 @@ export class TripRepositoryService {
       }
     }))
   }
-  async endTrip(trip_id:string,ended_time:Date) {
+  async endTrip(trip_id:string,ended_time:Date,user_id:string) {
+    // only allow owner to end the trip
     return prismaHandler(this.prisma.trip.update({
       where: {
-        id:trip_id
+        id: trip_id,
+        permission: {
+          some: {
+            user_id,
+            role: {
+              in:["owner"]
+            }
+          }
+        }
       },
       data: {
         ended_time
